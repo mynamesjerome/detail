@@ -1,0 +1,225 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { MapPin, Star, Calendar, ArrowRight, Shield } from 'lucide-react';
+
+interface HeroProps {
+  onExploreClick: () => void;
+  onBookClick: () => void;
+}
+
+interface HeroMediaItem {
+  id: string;
+  type: 'image' | 'video';
+  url: string;
+  bgPosition?: string;
+  name: string;
+}
+
+// High-definition cycling media items starting with video, interleaved with photos, with custom vertical framing
+const HERO_SHOWCASE_MEDIA: HeroMediaItem[] = [
+  {
+    id: 'porsche-video',
+    type: 'video',
+    url: '/porsche after.MOV',
+    bgPosition: 'center 50%',
+    name: 'Porsche 911 Showcase'
+  },
+  {
+    id: 'mustang-after',
+    type: 'image',
+    url: '/mustang after read this.JPG',
+    bgPosition: 'center 68%', // Framed perfectly on Mustang GT front and hood
+    name: 'Mustang GT Deep Gloss Finish'
+  },
+  {
+    id: 'corvette-video',
+    type: 'video',
+    url: '/corvette exterior after.MOV',
+    bgPosition: 'center 50%',
+    name: 'Corvette C8 Exterior Walkaround'
+  },
+  {
+    id: 'mercedes-after',
+    type: 'image',
+    url: '/mercedes after.JPG',
+    bgPosition: 'center 32%', // Moved up
+    name: 'Mercedes-Benz Deep Gloss Finish'
+  },
+  {
+    id: 'bmw-4-video',
+    type: 'video',
+    url: '/bmw 4 after.MOV',
+    bgPosition: 'center 50%',
+    name: 'BMW 4-Series Final Result'
+  },
+  {
+    id: 'aston-angled',
+    type: 'image',
+    url: '/aston 2.JPG',
+    bgPosition: 'center 64%', // Angled Aston Martin only
+    name: 'Aston Martin DBX Angled Detail'
+  },
+  {
+    id: 'silver-video',
+    type: 'video',
+    url: '/silver after.MOV',
+    bgPosition: 'center 50%',
+    name: 'Silver Sports Coupe Shine'
+  },
+  {
+    id: 'audi-after',
+    type: 'image',
+    url: '/audi.JPG',
+    bgPosition: 'center 60%', // Moved up a little bit as requested
+    name: 'Audi S-Line Front Finish'
+  },
+  {
+    id: 'bmw-5-interior',
+    type: 'video',
+    url: '/bmw 5 interior .MOV',
+    bgPosition: 'center 50%',
+    name: 'BMW Interior Precision Detail'
+  },
+];
+
+export const Hero: React.FC<HeroProps> = ({
+  onExploreClick,
+  onBookClick
+}) => {
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+
+  // Preload showcase background images
+  useEffect(() => {
+    HERO_SHOWCASE_MEDIA.forEach((item) => {
+      if (item.type === 'image') {
+        const img = new Image();
+        img.src = encodeURI(item.url);
+      }
+    });
+  }, []);
+
+  // Rotate background media items smoothly
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentMediaIndex((prev) => (prev + 1) % HERO_SHOWCASE_MEDIA.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const currentMedia = HERO_SHOWCASE_MEDIA[currentMediaIndex];
+
+  return (
+    <section className="relative min-h-screen flex items-center justify-center pt-28 sm:pt-32 pb-20 sm:pb-24 overflow-hidden bg-slate-950 text-white">
+      {/* Background Image/Video Slider with smooth cross-fade and custom vehicle framing */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={currentMedia.id}
+            initial={{ opacity: 0, scale: 1.04 }}
+            animate={{ opacity: 1, scale: 1.0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.6, ease: 'easeInOut' }}
+            className="absolute inset-0 overflow-hidden"
+          >
+            {currentMedia.type === 'video' ? (
+              <video
+                src={encodeURI(currentMedia.url)}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-full object-cover"
+                style={{ objectPosition: currentMedia.bgPosition || 'center center' }}
+              />
+            ) : (
+              <div
+                className="w-full h-full bg-cover bg-no-repeat"
+                style={{
+                  backgroundImage: `url("${encodeURI(currentMedia.url)}")`,
+                  backgroundPosition: currentMedia.bgPosition || 'center 50%',
+                }}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Atmospheric Gradient Overlay - low opacity so cars and videos are vivid and cinematic */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/20 pointer-events-none" />
+        <div className="absolute inset-0 bg-black/15 pointer-events-none" />
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center flex flex-col items-center">
+        {/* Main Slogan / Headline */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-normal sm:tracking-wide text-white uppercase leading-[1.12] mb-6 drop-shadow-2xl max-w-4xl"
+        >
+          FAST. LOCAL. <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-400">
+            DETAILED TO PERFECTION.
+          </span>
+        </motion.h1>
+
+        {/* Concise Subheadline */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-base sm:text-xl text-slate-300 font-normal max-w-2xl mb-10 leading-relaxed text-balance drop-shadow"
+        >
+          Austin's premier mobile auto detailing. We bring professional precision care and showroom shine straight to your driveway.
+        </motion.p>
+
+        {/* Big Main Button & Action Row */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md"
+        >
+          {/* BIG MAIN BOOK NOW BUTTON */}
+          <button
+            onClick={onBookClick}
+            className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-3 px-10 py-5 text-xl font-black text-white bg-blue-600 hover:bg-blue-500 rounded-2xl shadow-2xl shadow-blue-600/50 hover:shadow-blue-500/80 transition-all transform hover:-translate-y-1 active:translate-y-0 cursor-pointer tracking-wider uppercase border border-blue-400/30 group animate-shimmer relative overflow-hidden"
+          >
+            <Calendar className="w-6 h-6 text-blue-200 group-hover:scale-110 transition-transform relative z-10" />
+            <span className="relative z-10">BOOK NOW</span>
+            <ArrowRight className="w-6 h-6 text-blue-200 group-hover:translate-x-1 transition-transform relative z-10" />
+          </button>
+
+          {/* Secondary Pricing Button */}
+          <button
+            onClick={onExploreClick}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-5 text-base font-bold text-slate-200 bg-slate-900/80 hover:bg-slate-800 border border-slate-700 rounded-2xl backdrop-blur-md transition-all cursor-pointer hover:text-white"
+          >
+            <span>View Pricing</span>
+          </button>
+        </motion.div>
+
+        {/* Mobile Unit Guarantees */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+          className="mt-12 flex flex-wrap justify-center items-center gap-6 text-xs sm:text-sm font-medium text-slate-400"
+        >
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4 text-blue-400" />
+            <span>100% Mobile Service — We Come To You</span>
+          </div>
+          <span className="hidden sm:inline text-slate-700">•</span>
+          <div className="flex items-center gap-2">
+            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+            <span>Satisfaction Guaranteed</span>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Gradient Transition to Next Section */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-b from-transparent via-slate-950/80 to-slate-950 pointer-events-none" />
+    </section>
+  );
+};
+
