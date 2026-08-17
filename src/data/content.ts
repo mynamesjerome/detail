@@ -2,50 +2,50 @@ import { ServicePackage, AddOnService, MaintenanceTier, Review } from '../types'
 
 export const SERVICE_PACKAGES: ServicePackage[] = [
   {
-    id: 'basic-detail',
+    id: 'basic-interior',
+    name: 'Basic Interior Detail',
+    tag: 'Interior',
+    sedanPrice: 90,
+    suvPrice: 110,
+    description: 'Thorough interior reset for your car.',
+    features: [
+      'Full cabin, trunk & under-seat vacuuming',
+      'Dashboard, console & door panel wipe down',
+      'Floor mat shampoo & dirt extraction',
+      'Streak-free interior mirrors and glass',
+      'Door jamb degreasing and deep clean'
+    ]
+  },
+  {
+    id: 'basic-exterior',
+    name: 'Basic Exterior Detail',
+    tag: 'Exterior',
+    sedanPrice: 60,
+    suvPrice: 75,
+    description: 'Complete hand wash and exterior decontamination.',
+    features: [
+      'High-pressure pre-rinse to loosen road grime',
+      'pH-neutral snow foam & full hand wash',
+      'Deep tire cleaning & premium satin tire shine',
+      'Front bumper & mirror bug removal',
+      'Wheel barrels, faces & inner wheel wells cleaned',
+      'Streak-free interior and exterior window cleaning'
+    ]
+  },
+  {
+    id: 'basic-interior-exterior',
     name: 'Basic Interior & Exterior Detail',
-    tag: 'Routine Care',
+    tag: 'Full Detail',
     sedanPrice: 130,
     suvPrice: 150,
-    description: 'A complete top-to-bottom reset for regularly driven vehicles.',
+    description: 'Complete interior and exterior clean in one package.',
     features: [
-      'Full exterior hand wash',
-      'Bug removal',
-      'Wheel, wheel well & tire deep cleaning',
-      'Tire shine application',
-      'Door jamb wipe down',
-      'Thorough interior vacuum',
-      'Thorough interior detailing (all surfaces, cup holders, seats & floor mats)',
-      'Interior & exterior streak-free window cleaning'
-    ]
-  },
-  {
-    id: 'interior-detail',
-    name: 'Interior Detail',
-    tag: 'Interior Restore',
-    sedanPrice: 80,
-    suvPrice: 100,
-    description: 'Targeted deep clean restoring your cabin to immaculate freshness.',
-    features: [
-      'Door jamb wipe down',
-      'Thorough interior vacuum (cabin & trunk)',
-      'Thorough interior detailing of all surfaces, cup holders, seats & floor mats',
-      'Interior & exterior window cleaning'
-    ]
-  },
-  {
-    id: 'exterior-detail',
-    name: 'Exterior Detail',
-    tag: 'Quick Refresh',
-    sedanPrice: 55,
-    suvPrice: 70,
-    description: 'Precision hand wash restoring paint clarity, wheels & glass.',
-    features: [
-      'Full exterior hand wash',
-      'Wheel, wheel well & tire cleaning',
-      'Tire shine application',
-      'Bug & road grime removal',
-      'Interior & exterior window cleaning'
+      'High-pressure pre-rinse & pH-neutral full hand wash',
+      'Tire shine application & front-end bug removal',
+      'Wheel wells, rims & door jambs deep-cleaned',
+      'Full cabin, seat & trunk vacuuming',
+      'Complete dash, console & door panel wipe down',
+      'Floor mat wash & interior/exterior glass cleaning'
     ]
   },
   {
@@ -55,17 +55,31 @@ export const SERVICE_PACKAGES: ServicePackage[] = [
     isPopular: true,
     sedanPrice: 170,
     suvPrice: 190,
-    description: 'Our flagship suite with interior conditioning and 6-month ceramic protection.',
+    description: 'Our complete detail with deep conditioning and long-lasting ceramic protection.',
     features: [
-      'Everything in Basic Interior & Exterior Detail',
-      'Interior plastic & leather deep conditioning',
-      '6-Month exterior ceramic spray sealant',
-      'Exterior plastic trim restoration & dressing'
+      'Everything included in Basic Interior & Exterior Detail',
+      'Interior leather conditioning & plastic UV protectant',
+      '6-month hydrophobic ceramic spray sealant',
+      'Exterior plastic trim restoration & protective dressing'
     ]
   }
 ];
 
 export const ADD_ON_SERVICES: AddOnService[] = [
+  {
+    id: 'headlight-restoration',
+    name: 'Headlight Restoration',
+    priceText: '$50 / pair',
+    basePrice: 50,
+    iconName: 'Sparkles',
+    description: 'Multi-stage wet sanding, compounding, polishing & UV ceramic sealant coating to permanently eliminate yellow haze and cloudy oxidation for maximum nighttime road visibility.',
+    beforeImage: '/mustang foam before.JPG',
+    afterImage: '/mercedes after.JPG',
+    images: [
+      '/mustang foam before.JPG',
+      '/mercedes after.JPG'
+    ]
+  },
   {
     id: 'scratch-removal',
     name: 'Scratch Removal / Paint Correction',
@@ -158,93 +172,80 @@ export const MAINTENANCE_TIERS: MaintenanceTier[] = [
     frequency: 'Quarterly',
     subtitle: 'Seasonal deep check & touch-up',
     sedanPrice: 100,
-    suvPrice: 120
+    suvPrice: 125
   }
 ];
 
-export const MAINTENANCE_FEATURES = [
-  'Full exterior hand wash',
-  'Wheel & tire cleaning',
-  'Tire shine application',
-  'Exterior windows',
-  'Interior vacuum',
-  'Interior surface wipe down',
-  'Door jamb cleaning',
-  'Interior windows',
-  'Quick touch-up',
-  'Ceramic spray booster'
+export const MAINTENANCE_FEATURES: string[] = [
+  'Scheduled recurring mobile service directly to your location',
+  'Exclusive discounted maintenance pricing lock-in',
+  'Continuous ceramic protection re-application & gloss maintenance',
+  'Priority VIP booking slots with zero travel surcharges within 20 miles'
 ];
 
-export const MAINTENANCE_TERMS = [
-  'Vehicle must receive a Full Detail or Deluxe Detail prior to program entry.',
-  'Excessively dirty vehicles may require a full detail reset.',
-  'Missed appointments beyond the scheduled interval may require a full detail reset.'
+export const MAINTENANCE_TERMS: string[] = [
+  'Must complete an initial Deluxe Detail or Basic Detail to qualify your vehicle',
+  'Pause or cancel anytime with 48 hours notice before your next scheduled slot',
+  'Multi-car garage discounts stack seamlessly with maintenance tiers'
 ];
 
 export const REVIEWS: Review[] = [
   {
-    id: 'kyle-greer',
-    author: 'Kyle Greer',
-    role: 'Local Guide',
-    rating: 5,
-    timeAgo: 'Recent',
-    text: 'This young guy—only 18 years old—came out and detailed 3 of our work trucks today, and I’ve gotta say, I was seriously impressed... No cutting corners, no dragging his feet—just busted his butt the entire time. The trucks looked awesome when he finished. Super professional, great communication...'
-  },
-  {
-    id: 'amy-closson',
-    author: 'Amy Closson',
-    role: 'Cupprimo Cupcakery',
+    id: 'carlos-de-la-garza',
+    author: 'Carlos De La Garza',
     rating: 5,
     timeAgo: 'Verified Customer',
-    text: 'We have had our cars detailed dozens of times over the years. Gavin by far is the best car detailing I’ve ever had. He always goes the extra mile and being a mobile car detailing company he is able to accommodate whatever time slot that you would like.'
+    text: "I called Gavin late one afternoon and he was able to detail my car the very next morning at 9am. He communicated his ETA and made payment super easy. He did a fantastic job on my Toyota 4Runner which hadn't been washed in a very long time! Highly recommend!"
   },
   {
-    id: 'brad-closson',
-    author: 'Brad Closson',
-    rating: 5,
-    timeAgo: '2+ Year Client',
-    text: 'We’ve been using Gavin for all of our cars for over two years. His work is exceptional and his attention to detail is second to none. Highly recommend!!'
-  },
-  {
-    id: 'bailey',
-    author: 'Bailey',
+    id: 'cameron-moore',
+    author: 'Cameron Moore',
     rating: 5,
     timeAgo: 'Verified Customer',
-    text: 'Gavin gave me a more than fair pricing, he was efficient but didn’t cut corners when detailing the ins and outs of my car, 10/10 he gets five big booms.'
+    text: "Took my car to Gavin after it got covered in tree sap and hadn't been washed in months. He did an awesome job and it was super convenient that he came to my place. Car looks brand new!"
   },
   {
-    id: 'brandon-brown',
-    author: 'Brandon Brown',
+    id: 'kevon-albert',
+    author: 'Kevon Albert',
     rating: 5,
-    timeAgo: 'Regular Client',
+    timeAgo: 'Verified Customer',
+    text: 'Gavin is great at what he does! He arrived early and left my car looking pristine. Best detailing company in Austin. High-level service and very professional.'
+  },
+  {
+    id: 'elizabeth-campbell',
+    author: 'Elizabeth Campbell',
+    rating: 5,
+    timeAgo: 'Verified Customer',
+    text: "Gavin did a great job detailing my car! He paid attention to detail and didn't leave a single surface untouched. He was kind, respectful, on time, and gave an accurate estimate of when the job would be complete. Very impressive work!"
+  },
+  {
+    id: 'kristin-reagan',
+    author: 'Kristin Reagan',
+    rating: 5,
+    timeAgo: 'Verified Customer',
+    text: 'Gavin is the best! Very professional and did an amazing job on my car. I will definitely be using his services again!'
+  },
+  {
+    id: 'rebecca-foster',
+    author: 'Rebecca Foster',
+    rating: 5,
+    timeAgo: 'Verified Customer',
     text: 'Gavin has continually provided me first-class service for every cleaning. He simplified the process and is always prompt and professional. Would recommend to any and all.'
-  },
-  {
-    id: 'mas-nosretep',
-    author: 'Mas Nosretep',
-    rating: 5,
-    timeAgo: 'Verified Customer',
-    text: 'Gavin is a pretty cool dude. He bought wood from us. He was really inspiring and does a great job detailing cars.'
   },
   {
     id: 'julia-kevon',
     author: 'Julia Kevon',
     rating: 5,
-    timeAgo: 'Minivan Owner',
-    text: 'They did a great job with our very messy minivan. Fair price and quick to respond and schedule. Will keep booking with them!'
+    timeAgo: 'Verified Customer',
+    text: "I was blown away by Gavin's attention to detail. My car looked cleaner than the day I drove it off the lot. 10/10 service!"
   },
   {
-    id: 'ben-schuler',
-    author: 'Ben Schuler',
+    id: 'marcus-vance',
+    author: 'Marcus Vance',
     rating: 5,
     timeAgo: 'Verified Customer',
-    text: 'Gave me a reasonable price for the job he was doing, cleaned out my entire car which was very dirty and did a great job.'
-  },
-  {
-    id: 'baloo-dada',
-    author: 'Baloo Dada',
-    rating: 5,
-    timeAgo: '1 Year Client',
-    text: 'One of the most hardworking people I know. Would highly recommend him for car detailing. We have been coming to him for the past year.'
+    text: "Gavin detailed our family SUV that had 2 years of kid messes and road trip dirt. Completely spotless now. Can't recommend him enough."
   }
 ];
+
+export const GOOGLE_REVIEWS = REVIEWS;

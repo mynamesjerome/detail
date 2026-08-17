@@ -7,6 +7,7 @@ import { ServicePackages } from './components/ServicePackages';
 import { AddOnsGrid } from './components/AddOnsGrid';
 import { MaintenanceProgram } from './components/MaintenanceProgram';
 import { ReviewsMarquee } from './components/ReviewsMarquee';
+import { ServiceAreaSection } from './components/ServiceAreaSection';
 import { BeforeAfterGallery } from './components/BeforeAfterGallery';
 import { BookingSection } from './components/BookingSection';
 import { Footer } from './components/Footer';
@@ -98,7 +99,13 @@ export default function App() {
         {/* Infinite Scroll Reviews Marquee (bg-slate-950) */}
         <ReviewsMarquee />
 
-        {/* Smooth Gradient Transition: Reviews Marquee (bg-slate-950) -> Booking Section (bg-slate-900) */}
+        {/* Smooth Gradient Transition: Reviews Marquee (bg-slate-950) -> Service Area Section (bg-slate-950) */}
+        <div className="h-12 bg-gradient-to-b from-slate-950 to-slate-950" />
+
+        {/* 30-Mile Mobile Service Area & Zip Code Radius Checker (bg-slate-950) */}
+        <ServiceAreaSection onBookClick={() => scrollToSection('booking')} />
+
+        {/* Smooth Gradient Transition: Service Area (bg-slate-950) -> Booking Section (bg-slate-900) */}
         <div className="h-16 bg-gradient-to-b from-slate-950 to-slate-900" />
 
         {/* Booking & Instant Quote Calculator Section (bg-slate-900) */}

@@ -495,45 +495,65 @@ export const BeforeAfterGallery: React.FC = () => {
       let startX = 0;
       let startScrollLeft = 0;
 
-      const markInteraction = () => {
+      const markInteraction = (duration = 4500) => {
         interactionRef.current = true;
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
         timeoutRef.current = setTimeout(() => {
           interactionRef.current = false;
-        }, 2200);
+        }, duration);
       };
 
+      // Mouse drag for desktop, touch gestures natively handled by browser
       const onPointerDown = (e: PointerEvent) => {
+        if (e.pointerType === 'touch') {
+          markInteraction(5000);
+          return;
+        }
         isDragging = true;
         startX = e.clientX;
         startScrollLeft = el.scrollLeft;
-        markInteraction();
+        markInteraction(3000);
       };
 
       const onPointerMove = (e: PointerEvent) => {
+        if (e.pointerType === 'touch') return;
         if (isDragging) {
           const dx = e.clientX - startX;
           el.scrollLeft = startScrollLeft - dx;
-          markInteraction();
+          markInteraction(3000);
         }
       };
 
-      const onPointerUp = () => {
+      const onPointerUp = (e: PointerEvent) => {
+        if (e.pointerType === 'touch') return;
         if (isDragging) isDragging = false;
-        markInteraction();
+        markInteraction(2500);
       };
 
-      const onWheel = () => {
-        markInteraction();
+      const onScroll = () => {
+        markInteraction(4000);
+      };
+
+      const onTouchStart = () => {
+        markInteraction(5000);
+      };
+
+      const onTouchMove = () => {
+        markInteraction(5000);
+      };
+
+      const onTouchEnd = () => {
+        markInteraction(4000);
       };
 
       el.addEventListener('pointerdown', onPointerDown, { passive: true });
       window.addEventListener('pointermove', onPointerMove, { passive: true });
       window.addEventListener('pointerup', onPointerUp, { passive: true });
       window.addEventListener('pointercancel', onPointerUp, { passive: true });
-      el.addEventListener('touchstart', markInteraction, { passive: true });
-      el.addEventListener('touchend', markInteraction, { passive: true });
-      el.addEventListener('wheel', onWheel, { passive: true });
+      el.addEventListener('scroll', onScroll, { passive: true });
+      el.addEventListener('touchstart', onTouchStart, { passive: true });
+      el.addEventListener('touchmove', onTouchMove, { passive: true });
+      el.addEventListener('touchend', onTouchEnd, { passive: true });
 
       return () => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -541,9 +561,10 @@ export const BeforeAfterGallery: React.FC = () => {
         window.removeEventListener('pointermove', onPointerMove);
         window.removeEventListener('pointerup', onPointerUp);
         window.removeEventListener('pointercancel', onPointerUp);
-        el.removeEventListener('touchstart', markInteraction);
-        el.removeEventListener('touchend', markInteraction);
-        el.removeEventListener('wheel', onWheel);
+        el.removeEventListener('scroll', onScroll);
+        el.removeEventListener('touchstart', onTouchStart);
+        el.removeEventListener('touchmove', onTouchMove);
+        el.removeEventListener('touchend', onTouchEnd);
       };
     };
 
@@ -557,8 +578,24 @@ export const BeforeAfterGallery: React.FC = () => {
     };
   }, []);
 
+  const scrollRow = (rowNum: 1 | 2, direction: 'left' | 'right') => {
+    const el = rowNum === 1 ? galleryRow1Ref.current : galleryRow2Ref.current;
+    const interactRef = rowNum === 1 ? isInteracting1 : isInteracting2;
+    const timeoutRef = rowNum === 1 ? interactTimeout1 : interactTimeout2;
+    if (!el) return;
+
+    interactRef.current = true;
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      interactRef.current = false;
+    }, 4500);
+
+    const scrollAmount = direction === 'left' ? -360 : 360;
+    el.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  };
+
   return (
-    <section id="gallery" className="py-20 scroll-mt-20 sm:scroll-mt-24 bg-slate-950 text-white relative overflow-hidden select-none">
+    <section id="gallery" className="py-20 scroll-mt-20 sm:scroll-mt-24 bg-slate-950 text-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-8">
         {/* Section Header */}
         <motion.div
@@ -577,27 +614,66 @@ export const BeforeAfterGallery: React.FC = () => {
             Gavin's Detail Gallery
           </h2>
           <p className="mt-3 text-xs sm:text-sm text-slate-400 font-normal">
-            Click any vehicle to inspect in full resolution or play high-definition videos with custom speed controls.
+            Swipe left/right or click any vehicle to inspect in full resolution or play high-definition videos with custom speed controls.
           </p>
+
+          {/* Quick Manual Navigation Buttons for Mobile & Desktop */}
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                scrollRow(1, 'left');
+                scrollRow(2, 'right');
+              }}
+              className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-300 hover:text-white shadow-md active:scale-95 transition-all cursor-pointer"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft className="w-4 h-4 text-blue-400" />
+              <span>Scroll Left</span>
+            </button>
+
+            <span className="text-[11px] text-slate-500 font-medium px-1">
+              Swipe or use arrows
+            </span>
+
+            <button
+              type="button"
+              onClick={() => {
+                scrollRow(1, 'right');
+                scrollRow(2, 'left');
+              }}
+              className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-300 hover:text-white shadow-md active:scale-95 transition-all cursor-pointer"
+              aria-label="Scroll right"
+            >
+              <span>Scroll Right</span>
+              <ChevronRight className="w-4 h-4 text-blue-400" />
+            </button>
+          </div>
         </motion.div>
       </div>
 
       {/* Floating Scrapbook Stream Container */}
       <div className="relative w-full space-y-8 sm:space-y-12 py-2">
-        {/* Left and Right Fade Edge Overlays */}
+        {/* Left and Right Fade Edge Overlays with quick hover arrow triggers */}
         <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-28 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent z-20 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-28 bg-gradient-to-l from-slate-950 via-slate-950/80 to-transparent z-20 pointer-events-none" />
 
         {/* Stream Row 1 */}
         <div
           ref={galleryRow1Ref}
-          className="flex gap-6 sm:gap-10 w-full overflow-x-auto scrollbar-none py-10 sm:py-14 px-6 sm:px-12 items-center touch-pan-x cursor-grab active:cursor-grabbing select-none"
+          style={{
+            touchAction: 'pan-x pan-y',
+            WebkitOverflowScrolling: 'touch',
+            scrollBehavior: 'smooth'
+          }}
+          className="flex gap-6 sm:gap-10 w-full overflow-x-auto scrollbar-none py-10 sm:py-14 px-6 sm:px-12 items-center cursor-grab active:cursor-grabbing"
         >
           {row1Photos.map((group, index) => {
             const activeIdx = cardActiveIndices[group.id] || 0;
             const currentItem = group.items[activeIdx] || group.items[0];
             const isVideo = currentItem.type === 'video';
             const hasMultiple = group.items.length > 1;
+            const safeMediaUrl = encodeURI(currentItem.url);
 
             return (
               <motion.div
@@ -627,7 +703,7 @@ export const BeforeAfterGallery: React.FC = () => {
                 <div className={`relative w-full ${group.aspectRatio} rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950 flex items-center justify-center`}>
                   {isVideo ? (
                     <video
-                      src={currentItem.url}
+                      src={safeMediaUrl}
                       preload="metadata"
                       muted
                       playsInline
@@ -635,16 +711,19 @@ export const BeforeAfterGallery: React.FC = () => {
                     />
                   ) : (
                     <img
-                      src={currentItem.url}
+                      src={safeMediaUrl}
                       alt="Car Detail"
+                      decoding="async"
+                      loading="lazy"
                       onError={(e) => {
                         const target = e.currentTarget;
                         if (currentItem.fallbackUrl && !target.src.includes(encodeURI(currentItem.fallbackUrl))) {
                           target.src = encodeURI(currentItem.fallbackUrl);
+                        } else if (!target.src.includes(encodeURI('/mercedes after.JPG'))) {
+                          target.src = encodeURI('/mercedes after.JPG');
                         }
                       }}
                       className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105"
-                      loading="lazy"
                     />
                   )}
 
@@ -704,13 +783,19 @@ export const BeforeAfterGallery: React.FC = () => {
         {/* Stream Row 2 */}
         <div
           ref={galleryRow2Ref}
-          className="flex gap-6 sm:gap-10 w-full overflow-x-auto scrollbar-none py-10 sm:py-14 px-6 sm:px-12 items-center touch-pan-x cursor-grab active:cursor-grabbing select-none"
+          style={{
+            touchAction: 'pan-x pan-y',
+            WebkitOverflowScrolling: 'touch',
+            scrollBehavior: 'smooth'
+          }}
+          className="flex gap-6 sm:gap-10 w-full overflow-x-auto scrollbar-none py-10 sm:py-14 px-6 sm:px-12 items-center cursor-grab active:cursor-grabbing"
         >
           {row2Photos.map((group, index) => {
             const activeIdx = cardActiveIndices[group.id] || 0;
             const currentItem = group.items[activeIdx] || group.items[0];
             const isVideo = currentItem.type === 'video';
             const hasMultiple = group.items.length > 1;
+            const safeMediaUrl = encodeURI(currentItem.url);
 
             return (
               <motion.div
@@ -740,7 +825,7 @@ export const BeforeAfterGallery: React.FC = () => {
                 <div className={`relative w-full ${group.aspectRatio} rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950 flex items-center justify-center`}>
                   {isVideo ? (
                     <video
-                      src={currentItem.url}
+                      src={safeMediaUrl}
                       preload="metadata"
                       muted
                       playsInline
@@ -748,16 +833,19 @@ export const BeforeAfterGallery: React.FC = () => {
                     />
                   ) : (
                     <img
-                      src={currentItem.url}
+                      src={safeMediaUrl}
                       alt="Car Detail"
+                      decoding="async"
+                      loading="lazy"
                       onError={(e) => {
                         const target = e.currentTarget;
                         if (currentItem.fallbackUrl && !target.src.includes(encodeURI(currentItem.fallbackUrl))) {
                           target.src = encodeURI(currentItem.fallbackUrl);
+                        } else if (!target.src.includes(encodeURI('/mercedes after.JPG'))) {
+                          target.src = encodeURI('/mercedes after.JPG');
                         }
                       }}
                       className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105"
-                      loading="lazy"
                     />
                   )}
 
@@ -938,7 +1026,7 @@ export const BeforeAfterGallery: React.FC = () => {
                     <video
                       key={activeMediaItem.url}
                       ref={videoRef}
-                      src={activeMediaItem.url}
+                      src={encodeURI(activeMediaItem.url)}
                       className="w-full h-full object-contain"
                       playsInline
                       loop
@@ -1122,12 +1210,15 @@ export const BeforeAfterGallery: React.FC = () => {
                     >
                       <img
                         key={activeMediaItem.url}
-                        src={activeMediaItem.url}
+                        src={encodeURI(activeMediaItem.url)}
                         alt="Car Detail"
+                        decoding="async"
                         onError={(e) => {
                           const target = e.currentTarget;
                           if (activeMediaItem.fallbackUrl && !target.src.includes(encodeURI(activeMediaItem.fallbackUrl))) {
                             target.src = encodeURI(activeMediaItem.fallbackUrl);
+                          } else if (!target.src.includes(encodeURI('/mercedes after.JPG'))) {
+                            target.src = encodeURI('/mercedes after.JPG');
                           }
                         }}
                         draggable={false}

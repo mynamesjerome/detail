@@ -112,3 +112,13 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #2563eb;
 }
+
+/* Map theme styling */
+.bright-clean-map .leaflet-tile-pane {
+  filter: contrast(1.06) brightness(1.02) saturate(1.1);
+}
+
+.bright-clean-map .leaflet-container {
+  background: #f8fafc !important;
+}
+

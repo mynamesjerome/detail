@@ -51,6 +51,11 @@ export const Footer: React.FC = () => {
                 </a>
               </li>
               <li>
+                <a href="#service-area" className="hover:text-white transition-colors">
+                  Service Area (20-Mile Radius)
+                </a>
+              </li>
+              <li>
                 <a href="#booking" className="hover:text-white transition-colors">
                   Book Mobile Detail
                 </a>
