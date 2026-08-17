@@ -66,7 +66,7 @@ const HERO_SHOWCASE_MEDIA: HeroMediaItem[] = [
   {
     id: 'porsche-video',
     type: 'video',
-    url: '/porsche after.MOV',
+    url: '/porsche after.mp4',
     poster: '/posters/porsche-poster.jpg',
     durationMs: 7000,
     bgPosition: 'center 50%',
@@ -91,7 +91,7 @@ const HERO_SHOWCASE_MEDIA: HeroMediaItem[] = [
   {
     id: 'silver-video',
     type: 'video',
-    url: '/silver after.MOV',
+    url: '/silver after.mp4',
     poster: '/posters/silver-poster.jpg',
     durationMs: 7000,
     bgPosition: 'center 50%',
@@ -108,7 +108,7 @@ const HERO_SHOWCASE_MEDIA: HeroMediaItem[] = [
   {
     id: 'bmw-5-foam',
     type: 'video',
-    url: '/bmw 5 foam.MOV',
+    url: '/bmw 5 foam.mp4',
     poster: '/posters/bmw-5-foam-poster.jpg',
     durationMs: 7000,
     bgPosition: 'center 50%',
@@ -134,18 +134,22 @@ export const Hero: React.FC<HeroProps> = ({
     });
   }, []);
 
-  // Slide rotation & video start (triggered strictly only on currentMediaIndex changes)
+  // Slide rotation & video playback management
   useEffect(() => {
     const currentItem = HERO_SHOWCASE_MEDIA[currentMediaIndex];
     
-    // Play active video immediately from the start
+    // Play active video smoothly
     if (currentItem.type === 'video') {
       const vid = videoRefs.current[currentMediaIndex];
       if (vid) {
-        vid.currentTime = 0;
-        const playPromise = vid.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(() => {});
+        vid.muted = true;
+        // Only seek to beginning if the video is currently paused/stopped
+        if (vid.paused) {
+          vid.currentTime = 0;
+          const playPromise = vid.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {});
+          }
         }
       }
     }
@@ -162,7 +166,7 @@ export const Hero: React.FC<HeroProps> = ({
     };
   }, [currentMediaIndex]);
 
-  // Pause previous slide's video after the 1.5s cross-fade transition completes
+  // Pause and reset previous slide's video after cross-fade completes
   useEffect(() => {
     if (prevMediaIndex === null) return;
     const cleanupTimer = setTimeout(() => {
@@ -171,6 +175,7 @@ export const Hero: React.FC<HeroProps> = ({
         const prevVid = videoRefs.current[prevMediaIndex];
         if (prevVid) {
           prevVid.pause();
+          prevVid.currentTime = 0;
         }
       }
     }, 1500);
@@ -210,8 +215,8 @@ export const Hero: React.FC<HeroProps> = ({
                   className="w-full h-full object-cover"
                   style={{ objectPosition: item.bgPosition || 'center center' }}
                 >
-                  <source src={encodeURI(item.url)} type="video/mp4" />
-                  <source src={encodeURI(item.url.replace('.mp4', '.MOV'))} type="video/quicktime" />
+                  <source src={encodeURI(item.url.replace(/\.mov$/i, '.mp4'))} type="video/mp4" />
+                  <source src={encodeURI(item.url.replace(/\.mp4$/i, '.MOV'))} type="video/quicktime" />
                 </video>
               ) : (
                 <div

@@ -373,39 +373,52 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
         .filter(Boolean)
         .join('\n');
 
-      const formDataObj = new FormData();
-      formDataObj.append('access_key', WEB3FORMS_ACCESS_KEY);
-      formDataObj.append('apikey', WEB3FORMS_ACCESS_KEY);
-      formDataObj.append('subject', `New Detailing Request from ${formData.fullName} - Gavin's Car Detailing`);
-      formDataObj.append('from_name', "Gavin's Car Detailing Web Booking");
-      formDataObj.append('name', formData.fullName);
-      formDataObj.append('phone', formData.phone);
-      formDataObj.append('email', formData.email.trim() || 'Not Provided');
-      formDataObj.append('service_type', planTypeLabel);
-      formDataObj.append('service_address', formData.austinAddress);
-      formDataObj.append('preferred_schedule', `${formData.preferredDate || 'ASAP / First Available'} (${formData.preferredTime})`);
-      formDataObj.append('vehicles_count', `${vehicles.length} Vehicle${vehicles.length > 1 ? 's' : ''}`);
-      formDataObj.append('vehicles_breakdown', vehicleSummaryText);
-      formDataObj.append('first_visit_total', `$${grandTotal}`);
-      formDataObj.append('recurring_rate', isMaintenanceMode ? `$${recurringGrandTotal}/visit` : 'N/A');
-      formDataObj.append('multi_vehicle_discount', totalDiscount > 0 ? `$${totalDiscount} discount applied` : 'None');
-      formDataObj.append('special_notes', formData.notes.trim() || 'None');
-      formDataObj.append('policy_verified', 'Yes (Confirmed $10 personal belongings policy & service terms)');
-      formDataObj.append('message', summaryMsg);
+      const payload = {
+        access_key: WEB3FORMS_ACCESS_KEY,
+        apikey: WEB3FORMS_ACCESS_KEY,
+        subject: `New Detailing Request from ${formData.fullName} - Gavin's Car Detailing`,
+        from_name: "Gavin's Car Detailing Web Booking",
+        name: formData.fullName,
+        phone: formData.phone,
+        email: formData.email.trim() || 'Not Provided',
+        service_type: planTypeLabel,
+        service_address: formData.austinAddress,
+        preferred_schedule: `${formData.preferredDate || 'ASAP / First Available'} (${formData.preferredTime})`,
+        vehicles_count: `${vehicles.length} Vehicle${vehicles.length > 1 ? 's' : ''}`,
+        vehicles_breakdown: vehicleSummaryText,
+        first_visit_total: `$${grandTotal}`,
+        recurring_rate: isMaintenanceMode ? `$${recurringGrandTotal}/visit` : 'N/A',
+        multi_vehicle_discount: totalDiscount > 0 ? `$${totalDiscount} discount applied` : 'None',
+        special_notes: formData.notes.trim() || 'None',
+        policy_verified: 'Yes (Confirmed $10 personal belongings policy & service terms)',
+        message: summaryMsg
+      };
 
-      // Direct client-side submission to Web3Forms API
+      // Direct client-side submission to Web3Forms API (JSON with FormData fallback)
       try {
         const response = await fetch('https://api.web3forms.com/submit', {
           method: 'POST',
           headers: {
+            'Content-Type': 'application/json',
             Accept: 'application/json',
           },
-          body: formDataObj
+          body: JSON.stringify(payload)
         });
         const resData = await response.json().catch(() => null);
-        console.log('Web3Forms submission response:', { status: response.status, data: resData });
+        console.log('Web3Forms JSON submission response:', { status: response.status, data: resData });
       } catch (err) {
-        console.warn('Direct fetch attempt:', err);
+        console.warn('Web3Forms JSON attempt failed, trying FormData fallback:', err);
+        try {
+          const formDataObj = new FormData();
+          Object.entries(payload).forEach(([k, v]) => formDataObj.append(k, String(v)));
+          await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: { Accept: 'application/json' },
+            body: formDataObj
+          });
+        } catch (fallbackErr) {
+          console.warn('Web3Forms FormData fallback error:', fallbackErr);
+        }
       }
 
       setSubmitted(true);

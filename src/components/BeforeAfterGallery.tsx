@@ -748,6 +748,15 @@ export const BeforeAfterGallery: React.FC = () => {
                       alt="Video Preview"
                       decoding="async"
                       loading="lazy"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        const fallback = getVideoPoster(safeMediaUrl);
+                        if (!target.src.includes(encodeURI(fallback))) {
+                          target.src = encodeURI(fallback);
+                        } else if (!target.src.includes(encodeURI('/mercedes after.JPG'))) {
+                          target.src = encodeURI('/mercedes after.JPG');
+                        }
+                      }}
                       className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105"
                     />
                   ) : (
@@ -869,6 +878,15 @@ export const BeforeAfterGallery: React.FC = () => {
                       alt="Video Preview"
                       decoding="async"
                       loading="lazy"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        const fallback = getVideoPoster(safeMediaUrl);
+                        if (!target.src.includes(encodeURI(fallback))) {
+                          target.src = encodeURI(fallback);
+                        } else if (!target.src.includes(encodeURI('/mercedes after.JPG'))) {
+                          target.src = encodeURI('/mercedes after.JPG');
+                        }
+                      }}
                       className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105"
                     />
                   ) : (
@@ -1084,7 +1102,7 @@ export const BeforeAfterGallery: React.FC = () => {
                       }}
                       onEnded={() => setIsPlaying(false)}
                     >
-                      <source src={encodeURI(activeMediaItem.url)} type="video/mp4" />
+                      <source src={encodeURI(activeMediaItem.url.replace(/\.mov$/i, '.mp4'))} type="video/mp4" />
                       <source src={encodeURI(activeMediaItem.url.replace(/\.mp4$/i, '.MOV'))} type="video/quicktime" />
                     </video>
 
