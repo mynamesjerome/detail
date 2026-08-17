@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { MapPin, Star, Calendar, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion } from 'motion/react';
+import { Star, Calendar, ArrowRight } from 'lucide-react';
 
 interface HeroProps {
   onExploreClick: () => void;
@@ -121,6 +121,8 @@ export const Hero: React.FC<HeroProps> = ({
   onBookClick
 }) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  const [prevMediaIndex, setPrevMediaIndex] = useState<number | null>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   // Preload showcase background images
   useEffect(() => {
@@ -132,58 +134,98 @@ export const Hero: React.FC<HeroProps> = ({
     });
   }, []);
 
-  // Rotate background media items smoothly with per-item duration support
+  // Slide rotation & video start (triggered strictly only on currentMediaIndex changes)
   useEffect(() => {
     const currentItem = HERO_SHOWCASE_MEDIA[currentMediaIndex];
+    
+    // Play active video immediately from the start
+    if (currentItem.type === 'video') {
+      const vid = videoRefs.current[currentMediaIndex];
+      if (vid) {
+        vid.currentTime = 0;
+        const playPromise = vid.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {});
+        }
+      }
+    }
+
+    // Schedule next slide after duration completes
     const duration = currentItem.durationMs || 6000;
-    const timer = setTimeout(() => {
+    const nextTimer = setTimeout(() => {
+      setPrevMediaIndex(currentMediaIndex);
       setCurrentMediaIndex((prev) => (prev + 1) % HERO_SHOWCASE_MEDIA.length);
     }, duration);
-    return () => clearTimeout(timer);
+
+    return () => {
+      clearTimeout(nextTimer);
+    };
   }, [currentMediaIndex]);
 
-  const currentMedia = HERO_SHOWCASE_MEDIA[currentMediaIndex];
+  // Pause previous slide's video after the 1.5s cross-fade transition completes
+  useEffect(() => {
+    if (prevMediaIndex === null) return;
+    const cleanupTimer = setTimeout(() => {
+      const prevItem = HERO_SHOWCASE_MEDIA[prevMediaIndex];
+      if (prevItem && prevItem.type === 'video') {
+        const prevVid = videoRefs.current[prevMediaIndex];
+        if (prevVid) {
+          prevVid.pause();
+        }
+      }
+    }, 1500);
+
+    return () => clearTimeout(cleanupTimer);
+  }, [prevMediaIndex]);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-28 sm:pt-32 pb-20 sm:pb-24 overflow-hidden bg-slate-950 text-white">
-      {/* Background Image/Video Slider with smooth cross-fade and custom vehicle framing */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <AnimatePresence mode="sync">
-          <motion.div
-            key={currentMedia.id}
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1.0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.6, ease: 'easeInOut' }}
-            className="absolute inset-0 overflow-hidden"
-          >
-            {currentMedia.type === 'video' ? (
-              <video
-                src={encodeURI(currentMedia.url)}
-                poster={currentMedia.poster ? encodeURI(currentMedia.poster) : undefined}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-                className="w-full h-full object-cover"
-                style={{ objectPosition: currentMedia.bgPosition || 'center center' }}
-              />
-            ) : (
-              <div
-                className="w-full h-full bg-cover bg-no-repeat"
-                style={{
-                  backgroundImage: `url("${encodeURI(currentMedia.url)}")`,
-                  backgroundPosition: currentMedia.bgPosition || 'center 50%',
-                }}
-              />
-            )}
-          </motion.div>
-        </AnimatePresence>
+      {/* Background Image/Video Slider with silky-smooth layered cross-dissolve */}
+      <div className="absolute inset-0 z-0 overflow-hidden bg-slate-950">
+        {HERO_SHOWCASE_MEDIA.map((item, idx) => {
+          const isActive = idx === currentMediaIndex;
+          const isPrev = idx === prevMediaIndex;
+
+          return (
+            <div
+              key={item.id}
+              style={{
+                zIndex: isActive ? 20 : isPrev ? 10 : 0,
+                opacity: isActive ? 1 : isPrev ? 1 : 0,
+                transition: 'opacity 1400ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+                willChange: 'opacity',
+                transform: 'translateZ(0)',
+              }}
+              className="absolute inset-0 overflow-hidden pointer-events-none"
+            >
+              {item.type === 'video' ? (
+                <video
+                  ref={(el) => (videoRefs.current[idx] = el)}
+                  src={encodeURI(item.url)}
+                  poster={item.poster ? encodeURI(item.poster) : undefined}
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                  className="w-full h-full object-cover"
+                  style={{ objectPosition: item.bgPosition || 'center center' }}
+                />
+              ) : (
+                <div
+                  className="w-full h-full bg-cover bg-no-repeat"
+                  style={{
+                    backgroundImage: `url("${encodeURI(item.url)}")`,
+                    backgroundPosition: item.bgPosition || 'center 50%',
+                  }}
+                />
+              )}
+            </div>
+          );
+        })}
 
         {/* Atmospheric Gradient Overlay - low opacity so cars and videos are vivid and cinematic */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/20 pointer-events-none" />
-        <div className="absolute inset-0 bg-black/15 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/20 pointer-events-none z-30" />
+        <div className="absolute inset-0 bg-black/15 pointer-events-none z-30" />
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center flex flex-col items-center">
