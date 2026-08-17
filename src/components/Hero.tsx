@@ -11,51 +11,80 @@ interface HeroMediaItem {
   id: string;
   type: 'image' | 'video';
   url: string;
+  poster?: string;
+  durationMs?: number;
   bgPosition?: string;
   name: string;
 }
 
-// High-definition cycling media items starting with video, interleaved with photos, with custom vertical framing
+// High-definition cycling media items: Corvette -> BMW Interior (extended) -> BMW M4 Foam -> BMW M4 Pan -> Mustang -> Rest
 const HERO_SHOWCASE_MEDIA: HeroMediaItem[] = [
   {
-    id: 'porsche-video',
+    id: 'corvette-video',
     type: 'video',
-    url: '/porsche after.MOV',
+    url: '/corvette exterior after.MOV',
+    poster: '/posters/corvette-poster.jpg',
+    durationMs: 7000,
     bgPosition: 'center 50%',
-    name: 'Porsche 911 Showcase'
+    name: 'Corvette C8 Exterior Walkaround'
+  },
+  {
+    id: 'bmw-interior-video',
+    type: 'video',
+    url: '/bmw interior.MOV',
+    poster: '/posters/bmw-interior-poster.jpg',
+    durationMs: 11000, // Extended duration to appreciate full cockpit detail
+    bgPosition: 'center 50%',
+    name: 'BMW Interior Precision Detail'
+  },
+  {
+    id: 'bmw-m4-foam-video',
+    type: 'video',
+    url: '/bmw m4 foam.MOV',
+    poster: '/posters/bmw-m4-foam-poster.jpg',
+    durationMs: 7500,
+    bgPosition: 'center 50%',
+    name: 'BMW M4 Snow Foam Bath'
+  },
+  {
+    id: 'bmw-m4-pan-video',
+    type: 'video',
+    url: '/bmw m4 pan.MOV',
+    poster: '/posters/bmw-m4-pan-poster.jpg',
+    durationMs: 7500,
+    bgPosition: 'center 50%',
+    name: 'BMW M4 Exterior Walkaround'
   },
   {
     id: 'mustang-after',
     type: 'image',
     url: '/mustang after read this.JPG',
+    durationMs: 6000,
     bgPosition: 'center 68%', // Framed perfectly on Mustang GT front and hood
     name: 'Mustang GT Deep Gloss Finish'
   },
   {
-    id: 'corvette-video',
+    id: 'porsche-video',
     type: 'video',
-    url: '/corvette exterior after.MOV',
+    url: '/porsche after.MOV',
+    poster: '/posters/porsche-poster.jpg',
+    durationMs: 7000,
     bgPosition: 'center 50%',
-    name: 'Corvette C8 Exterior Walkaround'
+    name: 'Porsche 911 Showcase'
   },
   {
     id: 'mercedes-after',
     type: 'image',
     url: '/mercedes after.JPG',
+    durationMs: 6000,
     bgPosition: 'center 32%', // Moved up
     name: 'Mercedes-Benz Deep Gloss Finish'
-  },
-  {
-    id: 'bmw-4-video',
-    type: 'video',
-    url: '/bmw 4 after.MOV',
-    bgPosition: 'center 50%',
-    name: 'BMW 4-Series Final Result'
   },
   {
     id: 'aston-angled',
     type: 'image',
     url: '/aston 2.JPG',
+    durationMs: 6000,
     bgPosition: 'center 64%', // Angled Aston Martin only
     name: 'Aston Martin DBX Angled Detail'
   },
@@ -63,6 +92,8 @@ const HERO_SHOWCASE_MEDIA: HeroMediaItem[] = [
     id: 'silver-video',
     type: 'video',
     url: '/silver after.MOV',
+    poster: '/posters/silver-poster.jpg',
+    durationMs: 7000,
     bgPosition: 'center 50%',
     name: 'Silver Sports Coupe Shine'
   },
@@ -70,16 +101,19 @@ const HERO_SHOWCASE_MEDIA: HeroMediaItem[] = [
     id: 'audi-after',
     type: 'image',
     url: '/audi.JPG',
+    durationMs: 6000,
     bgPosition: 'center 60%', // Moved up a little bit as requested
     name: 'Audi S-Line Front Finish'
   },
   {
-    id: 'bmw-5-interior',
+    id: 'bmw-5-foam',
     type: 'video',
-    url: '/bmw 5 interior .MOV',
+    url: '/bmw 5 foam.MOV',
+    poster: '/posters/bmw-5-foam-poster.jpg',
+    durationMs: 7000,
     bgPosition: 'center 50%',
-    name: 'BMW Interior Precision Detail'
-  },
+    name: 'BMW 5-Series Foam Bath'
+  }
 ];
 
 export const Hero: React.FC<HeroProps> = ({
@@ -98,13 +132,15 @@ export const Hero: React.FC<HeroProps> = ({
     });
   }, []);
 
-  // Rotate background media items smoothly
+  // Rotate background media items smoothly with per-item duration support
   useEffect(() => {
-    const timer = setInterval(() => {
+    const currentItem = HERO_SHOWCASE_MEDIA[currentMediaIndex];
+    const duration = currentItem.durationMs || 6000;
+    const timer = setTimeout(() => {
       setCurrentMediaIndex((prev) => (prev + 1) % HERO_SHOWCASE_MEDIA.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, []);
+    }, duration);
+    return () => clearTimeout(timer);
+  }, [currentMediaIndex]);
 
   const currentMedia = HERO_SHOWCASE_MEDIA[currentMediaIndex];
 
@@ -124,10 +160,12 @@ export const Hero: React.FC<HeroProps> = ({
             {currentMedia.type === 'video' ? (
               <video
                 src={encodeURI(currentMedia.url)}
+                poster={currentMedia.poster ? encodeURI(currentMedia.poster) : undefined}
                 autoPlay
                 muted
                 loop
                 playsInline
+                preload="auto"
                 className="w-full h-full object-cover"
                 style={{ objectPosition: currentMedia.bgPosition || 'center center' }}
               />

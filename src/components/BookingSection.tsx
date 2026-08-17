@@ -255,6 +255,8 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
   const recurringGrandTotal = vehicleBreakdowns.reduce((sum, b) => sum + b.recurringVisitTotal, 0);
   const totalDiscount = vehicleBreakdowns.reduce((sum, b) => sum + b.discount, 0);
 
+  const todayStr = new Date().toISOString().split('T')[0];
+
   const scrollToMissingField = (elementId: string) => {
     setTimeout(() => {
       const el = document.getElementById(elementId);
@@ -1051,19 +1053,24 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                   </h3>
 
                   <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
+                    <div className="min-w-0">
                       <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                         Preferred Date
                       </label>
-                      <input
-                        type="date"
-                        value={formData.preferredDate}
-                        onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
-                      />
+                      <div className="relative w-full min-w-0">
+                        <input
+                          id="input-date"
+                          type="date"
+                          min={todayStr}
+                          value={formData.preferredDate}
+                          onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
+                          style={{ colorScheme: 'dark' }}
+                          className="w-full min-w-0 max-w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-sm text-white focus:outline-none focus:border-blue-500 [color-scheme:dark] transition-colors"
+                        />
+                      </div>
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
                       <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                         Preferred Arrival Time Slot
                       </label>
@@ -1074,14 +1081,17 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                           '1:00 PM Early Afternoon',
                           '3:30 PM Late Afternoon',
                           'Flexible / First Available'
-                        ].map((timeOption) => {
+                        ].map((timeOption, idx) => {
                           const isSelected = formData.preferredTime === timeOption;
+                          const isLast = idx === 4;
                           return (
                             <button
                               key={timeOption}
                               type="button"
                               onClick={() => setFormData({ ...formData, preferredTime: timeOption })}
-                              className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer text-left ${
+                              className={`px-3 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer text-left ${
+                                isLast ? 'col-span-2' : ''
+                              } ${
                                 isSelected
                                   ? 'bg-blue-600 text-white border-blue-500 shadow-md'
                                   : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-600'

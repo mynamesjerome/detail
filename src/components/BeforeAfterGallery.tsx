@@ -25,10 +25,26 @@ export interface MediaItem {
   id: string;
   type: 'image' | 'video';
   url: string;
+  poster?: string;
   title?: string;
   label?: string;
   fallbackUrl?: string;
 }
+
+export const getVideoPoster = (url: string): string => {
+  const lower = url.toLowerCase();
+  if (lower.includes('corvette')) return '/posters/corvette-poster.jpg';
+  if (lower.includes('bmw m4 foam') || lower.includes('m4 foam')) return '/posters/bmw-m4-foam-poster.jpg';
+  if (lower.includes('bmw m4 pan') || lower.includes('m4 pan')) return '/posters/bmw-m4-pan-poster.jpg';
+  if (lower.includes('bmw 4')) return '/posters/bmw-4-poster.jpg';
+  if (lower.includes('bmw interior') || lower.includes('bmw-interior')) return '/posters/bmw-interior-poster.jpg';
+  if (lower.includes('bmw 5 interior') || lower.includes('bmw 5 interior .mov')) return '/posters/bmw-5-interior-poster.jpg';
+  if (lower.includes('bmw 5 foam')) return '/posters/bmw-5-foam-poster.jpg';
+  if (lower.includes('porsche')) return '/posters/porsche-poster.jpg';
+  if (lower.includes('silver')) return '/posters/silver-poster.jpg';
+  if (lower.includes('explorer')) return '/posters/explorer-foam-poster.jpg';
+  return '/mercedes after.JPG';
+};
 
 export interface VehicleGroup {
   id: string;
@@ -57,22 +73,22 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
     delay: 0
   },
   {
-    id: 'bmw-5-series',
+    id: 'bmw-m4-showcase',
     items: [
-      { id: 'bmw-5-foam', type: 'video', url: '/bmw 5 foam.MOV' },
-      { id: 'bmw-5-interior', type: 'video', url: '/bmw 5 interior .MOV' }
+      { id: 'bmw-m4-foam', type: 'video', url: '/bmw m4 foam.MOV', poster: '/posters/bmw-m4-foam-poster.jpg', title: 'BMW M4 Snow Foam Bath' },
+      { id: 'bmw-m4-pan', type: 'video', url: '/bmw m4 pan.MOV', poster: '/posters/bmw-m4-pan-poster.jpg', title: 'BMW M4 Exterior Gloss' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
-    rotation: 2.0,
-    floatDuration: 8.0,
+    rotation: 2.2,
+    floatDuration: 8.2,
     yOffset: 10,
     delay: 0.5
   },
   {
     id: 'corvette',
     items: [
-      { id: 'corvette-ext', type: 'video', url: '/corvette exterior after.MOV' }
+      { id: 'corvette-ext', type: 'video', url: '/corvette exterior after.MOV', poster: '/posters/corvette-poster.jpg' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -80,6 +96,18 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
     floatDuration: 6.8,
     yOffset: -10,
     delay: 0.4
+  },
+  {
+    id: 'bmw-interior-showcase',
+    items: [
+      { id: 'bmw-interior-detail', type: 'video', url: '/bmw interior.MOV', poster: '/posters/bmw-interior-poster.jpg', title: 'BMW Interior Precision' }
+    ],
+    aspectRatio: 'aspect-[9/16]',
+    widthClass: 'w-64 sm:w-72',
+    rotation: 1.8,
+    floatDuration: 7.4,
+    yOffset: 8,
+    delay: 0.7
   },
   {
     id: 'mercedes-benz',
@@ -109,7 +137,7 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
   {
     id: 'bmw-4-series',
     items: [
-      { id: 'bmw-4-after', type: 'video', url: '/bmw 4 after.MOV' }
+      { id: 'bmw-4-after', type: 'video', url: '/bmw 4 after.MOV', poster: '/posters/bmw-4-poster.jpg' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -121,7 +149,7 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
   {
     id: 'porsche',
     items: [
-      { id: 'porsche-after', type: 'video', url: '/porsche after.MOV' }
+      { id: 'porsche-after', type: 'video', url: '/porsche after.MOV', poster: '/posters/porsche-poster.jpg' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -133,7 +161,7 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
   {
     id: 'explorer-foam',
     items: [
-      { id: 'explorer-foam', type: 'video', url: '/explorer foam.MOV' }
+      { id: 'explorer-foam', type: 'video', url: '/explorer foam.MOV', poster: '/posters/explorer-foam-poster.jpg' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -157,7 +185,7 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
   {
     id: 'silver-spec',
     items: [
-      { id: 'silver-after', type: 'video', url: '/silver after.MOV' }
+      { id: 'silver-after', type: 'video', url: '/silver after.MOV', poster: '/posters/silver-poster.jpg' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -715,12 +743,12 @@ export const BeforeAfterGallery: React.FC = () => {
                 {/* Media Container */}
                 <div className={`relative w-full ${group.aspectRatio} rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950 flex items-center justify-center`}>
                   {isVideo ? (
-                    <video
-                      src={safeMediaUrl}
-                      preload="metadata"
-                      muted
-                      playsInline
-                      className="w-full h-full object-cover"
+                    <img
+                      src={currentItem.poster ? encodeURI(currentItem.poster) : getVideoPoster(safeMediaUrl)}
+                      alt="Video Preview"
+                      decoding="async"
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105"
                     />
                   ) : (
                     <img
@@ -836,12 +864,12 @@ export const BeforeAfterGallery: React.FC = () => {
                 {/* Media Container */}
                 <div className={`relative w-full ${group.aspectRatio} rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950 flex items-center justify-center`}>
                   {isVideo ? (
-                    <video
-                      src={safeMediaUrl}
-                      preload="metadata"
-                      muted
-                      playsInline
-                      className="w-full h-full object-cover"
+                    <img
+                      src={currentItem.poster ? encodeURI(currentItem.poster) : getVideoPoster(safeMediaUrl)}
+                      alt="Video Preview"
+                      decoding="async"
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105"
                     />
                   ) : (
                     <img
@@ -1038,7 +1066,9 @@ export const BeforeAfterGallery: React.FC = () => {
                     <video
                       key={activeMediaItem.url}
                       ref={videoRef}
-                      src={encodeURI(activeMediaItem.url)}
+                      src={`${encodeURI(activeMediaItem.url)}#t=0.001`}
+                      poster={activeMediaItem.poster ? encodeURI(activeMediaItem.poster) : getVideoPoster(activeMediaItem.url)}
+                      preload="auto"
                       className="w-full h-full object-contain"
                       playsInline
                       loop
