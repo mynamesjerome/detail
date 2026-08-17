@@ -453,31 +453,41 @@ export const BeforeAfterGallery: React.FC = () => {
   useEffect(() => {
     let animId: number;
     const speed1 = 0.55;
-    const speed2 = -0.5;
+    const speed2 = -0.55;
+
+    // Center starting positions smoothly
+    if (galleryRow1Ref.current && galleryRow1Ref.current.scrollWidth > 0) {
+      galleryRow1Ref.current.scrollLeft = galleryRow1Ref.current.scrollWidth / 3;
+    }
+    if (galleryRow2Ref.current && galleryRow2Ref.current.scrollWidth > 0) {
+      galleryRow2Ref.current.scrollLeft = galleryRow2Ref.current.scrollWidth / 3;
+    }
 
     const scrollLoop = () => {
       if (galleryRow1Ref.current && !isInteracting1.current) {
         const el1 = galleryRow1Ref.current;
         el1.scrollLeft += speed1;
-        if (el1.scrollLeft >= el1.scrollWidth / 2) {
-          el1.scrollLeft -= el1.scrollWidth / 2;
+        const oneThird1 = el1.scrollWidth / 3;
+        if (oneThird1 > 0 && el1.scrollLeft >= oneThird1 * 2) {
+          el1.scrollLeft -= oneThird1;
+        } else if (oneThird1 > 0 && el1.scrollLeft <= 0) {
+          el1.scrollLeft += oneThird1;
         }
       }
 
       if (galleryRow2Ref.current && !isInteracting2.current) {
         const el2 = galleryRow2Ref.current;
         el2.scrollLeft += speed2;
-        if (el2.scrollLeft <= 0) {
-          el2.scrollLeft += el2.scrollWidth / 2;
+        const oneThird2 = el2.scrollWidth / 3;
+        if (oneThird2 > 0 && el2.scrollLeft <= 5) {
+          el2.scrollLeft += oneThird2;
+        } else if (oneThird2 > 0 && el2.scrollLeft >= oneThird2 * 2) {
+          el2.scrollLeft -= oneThird2;
         }
       }
 
       animId = requestAnimationFrame(scrollLoop);
     };
-
-    if (galleryRow2Ref.current) {
-      galleryRow2Ref.current.scrollLeft = galleryRow2Ref.current.scrollWidth / 4;
-    }
 
     animId = requestAnimationFrame(scrollLoop);
 
@@ -495,7 +505,7 @@ export const BeforeAfterGallery: React.FC = () => {
       let startX = 0;
       let startScrollLeft = 0;
 
-      const markInteraction = (duration = 4500) => {
+      const markInteraction = (duration = 3500) => {
         interactionRef.current = true;
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
         timeoutRef.current = setTimeout(() => {
@@ -503,65 +513,69 @@ export const BeforeAfterGallery: React.FC = () => {
         }, duration);
       };
 
-      // Mouse drag for desktop, touch gestures natively handled by browser
-      const onPointerDown = (e: PointerEvent) => {
-        if (e.pointerType === 'touch') {
-          markInteraction(5000);
-          return;
+      // Desktop: pause on mouse hover, resume on mouse leave
+      const onMouseEnter = () => {
+        interactionRef.current = true;
+      };
+
+      const onMouseLeave = () => {
+        if (!isDragging) {
+          interactionRef.current = false;
         }
+      };
+
+      // Desktop mouse drag
+      const onMouseDown = (e: MouseEvent) => {
         isDragging = true;
         startX = e.clientX;
         startScrollLeft = el.scrollLeft;
-        markInteraction(3000);
+        interactionRef.current = true;
       };
 
-      const onPointerMove = (e: PointerEvent) => {
-        if (e.pointerType === 'touch') return;
+      const onMouseMove = (e: MouseEvent) => {
         if (isDragging) {
           const dx = e.clientX - startX;
           el.scrollLeft = startScrollLeft - dx;
-          markInteraction(3000);
+          interactionRef.current = true;
         }
       };
 
-      const onPointerUp = (e: PointerEvent) => {
-        if (e.pointerType === 'touch') return;
-        if (isDragging) isDragging = false;
-        markInteraction(2500);
+      const onMouseUp = () => {
+        if (isDragging) {
+          isDragging = false;
+          markInteraction(1500);
+        }
       };
 
-      const onScroll = () => {
-        markInteraction(4000);
-      };
-
+      // Mobile touch events: allows user to freely swipe horizontally and vertically
       const onTouchStart = () => {
-        markInteraction(5000);
+        markInteraction(4000);
       };
 
       const onTouchMove = () => {
-        markInteraction(5000);
-      };
-
-      const onTouchEnd = () => {
         markInteraction(4000);
       };
 
-      el.addEventListener('pointerdown', onPointerDown, { passive: true });
-      window.addEventListener('pointermove', onPointerMove, { passive: true });
-      window.addEventListener('pointerup', onPointerUp, { passive: true });
-      window.addEventListener('pointercancel', onPointerUp, { passive: true });
-      el.addEventListener('scroll', onScroll, { passive: true });
+      const onTouchEnd = () => {
+        markInteraction(3000);
+      };
+
+      el.addEventListener('mouseenter', onMouseEnter);
+      el.addEventListener('mouseleave', onMouseLeave);
+      el.addEventListener('mousedown', onMouseDown);
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
       el.addEventListener('touchstart', onTouchStart, { passive: true });
       el.addEventListener('touchmove', onTouchMove, { passive: true });
       el.addEventListener('touchend', onTouchEnd, { passive: true });
 
       return () => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        el.removeEventListener('pointerdown', onPointerDown);
-        window.removeEventListener('pointermove', onPointerMove);
-        window.removeEventListener('pointerup', onPointerUp);
-        window.removeEventListener('pointercancel', onPointerUp);
-        el.removeEventListener('scroll', onScroll);
+        el.removeEventListener('mouseenter', onMouseEnter);
+        el.removeEventListener('mouseleave', onMouseLeave);
+        el.removeEventListener('mousedown', onMouseDown);
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
         el.removeEventListener('touchstart', onTouchStart);
         el.removeEventListener('touchmove', onTouchMove);
         el.removeEventListener('touchend', onTouchEnd);
@@ -664,7 +678,6 @@ export const BeforeAfterGallery: React.FC = () => {
           style={{
             touchAction: 'pan-x pan-y',
             WebkitOverflowScrolling: 'touch',
-            scrollBehavior: 'smooth'
           }}
           className="flex gap-6 sm:gap-10 w-full overflow-x-auto scrollbar-none py-10 sm:py-14 px-6 sm:px-12 items-center cursor-grab active:cursor-grabbing"
         >
@@ -786,7 +799,6 @@ export const BeforeAfterGallery: React.FC = () => {
           style={{
             touchAction: 'pan-x pan-y',
             WebkitOverflowScrolling: 'touch',
-            scrollBehavior: 'smooth'
           }}
           className="flex gap-6 sm:gap-10 w-full overflow-x-auto scrollbar-none py-10 sm:py-14 px-6 sm:px-12 items-center cursor-grab active:cursor-grabbing"
         >
