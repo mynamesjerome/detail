@@ -75,8 +75,8 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
   {
     id: 'bmw-m4-showcase',
     items: [
-      { id: 'bmw-m4-foam', type: 'video', url: '/bmw m4 foam.MOV', poster: '/posters/bmw-m4-foam-poster.jpg', title: 'BMW M4 Snow Foam Bath' },
-      { id: 'bmw-m4-pan', type: 'video', url: '/bmw m4 pan.MOV', poster: '/posters/bmw-m4-pan-poster.jpg', title: 'BMW M4 Exterior Gloss' }
+      { id: 'bmw-m4-foam', type: 'video', url: '/bmw m4 foam.mp4', poster: '/posters/bmw-m4-foam-poster.jpg', title: 'BMW M4 Snow Foam Bath' },
+      { id: 'bmw-m4-pan', type: 'video', url: '/bmw m4 pan.mp4', poster: '/posters/bmw-m4-pan-poster.jpg', title: 'BMW M4 Exterior Gloss' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -88,7 +88,7 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
   {
     id: 'corvette',
     items: [
-      { id: 'corvette-ext', type: 'video', url: '/corvette exterior after.MOV', poster: '/posters/corvette-poster.jpg' }
+      { id: 'corvette-ext', type: 'video', url: '/corvette exterior after.mp4', poster: '/posters/corvette-poster.jpg' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -100,7 +100,7 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
   {
     id: 'bmw-interior-showcase',
     items: [
-      { id: 'bmw-interior-detail', type: 'video', url: '/bmw interior.MOV', poster: '/posters/bmw-interior-poster.jpg', title: 'BMW Interior Precision' }
+      { id: 'bmw-interior-detail', type: 'video', url: '/bmw interior.mp4', poster: '/posters/bmw-interior-poster.jpg', title: 'BMW Interior Precision' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -137,7 +137,7 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
   {
     id: 'bmw-4-series',
     items: [
-      { id: 'bmw-4-after', type: 'video', url: '/bmw 4 after.MOV', poster: '/posters/bmw-4-poster.jpg' }
+      { id: 'bmw-4-after', type: 'video', url: '/bmw 4 after.mp4', poster: '/posters/bmw-4-poster.jpg' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -149,7 +149,7 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
   {
     id: 'porsche',
     items: [
-      { id: 'porsche-after', type: 'video', url: '/porsche after.MOV', poster: '/posters/porsche-poster.jpg' }
+      { id: 'porsche-after', type: 'video', url: '/porsche after.mp4', poster: '/posters/porsche-poster.jpg' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -161,7 +161,7 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
   {
     id: 'explorer-foam',
     items: [
-      { id: 'explorer-foam', type: 'video', url: '/explorer foam.MOV', poster: '/posters/explorer-foam-poster.jpg' }
+      { id: 'explorer-foam', type: 'video', url: '/explorer foam.mp4', poster: '/posters/explorer-foam-poster.jpg' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -185,7 +185,7 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
   {
     id: 'silver-spec',
     items: [
-      { id: 'silver-after', type: 'video', url: '/silver after.MOV', poster: '/posters/silver-poster.jpg' }
+      { id: 'silver-after', type: 'video', url: '/silver after.mp4', poster: '/posters/silver-poster.jpg' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -1066,7 +1066,6 @@ export const BeforeAfterGallery: React.FC = () => {
                     <video
                       key={activeMediaItem.url}
                       ref={videoRef}
-                      src={`${encodeURI(activeMediaItem.url)}#t=0.001`}
                       poster={activeMediaItem.poster ? encodeURI(activeMediaItem.poster) : getVideoPoster(activeMediaItem.url)}
                       preload="auto"
                       className="w-full h-full object-contain"
@@ -1084,7 +1083,10 @@ export const BeforeAfterGallery: React.FC = () => {
                         }
                       }}
                       onEnded={() => setIsPlaying(false)}
-                    />
+                    >
+                      <source src={encodeURI(activeMediaItem.url)} type="video/mp4" />
+                      <source src={encodeURI(activeMediaItem.url.replace(/\.mp4$/i, '.MOV'))} type="video/quicktime" />
+                    </video>
 
                     {/* Big Centered Play/Pause Click Overlay */}
                     {(!isPlaying || showVideoControls) && (

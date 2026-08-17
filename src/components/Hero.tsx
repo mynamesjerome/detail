@@ -22,7 +22,7 @@ const HERO_SHOWCASE_MEDIA: HeroMediaItem[] = [
   {
     id: 'corvette-video',
     type: 'video',
-    url: '/corvette exterior after.MOV',
+    url: '/corvette exterior after.mp4',
     poster: '/posters/corvette-poster.jpg',
     durationMs: 7000,
     bgPosition: 'center 50%',
@@ -31,7 +31,7 @@ const HERO_SHOWCASE_MEDIA: HeroMediaItem[] = [
   {
     id: 'bmw-interior-video',
     type: 'video',
-    url: '/bmw interior.MOV',
+    url: '/bmw interior.mp4',
     poster: '/posters/bmw-interior-poster.jpg',
     durationMs: 11000, // Extended duration to appreciate full cockpit detail
     bgPosition: 'center 50%',
@@ -40,7 +40,7 @@ const HERO_SHOWCASE_MEDIA: HeroMediaItem[] = [
   {
     id: 'bmw-m4-foam-video',
     type: 'video',
-    url: '/bmw m4 foam.MOV',
+    url: '/bmw m4 foam.mp4',
     poster: '/posters/bmw-m4-foam-poster.jpg',
     durationMs: 7500,
     bgPosition: 'center 50%',
@@ -49,7 +49,7 @@ const HERO_SHOWCASE_MEDIA: HeroMediaItem[] = [
   {
     id: 'bmw-m4-pan-video',
     type: 'video',
-    url: '/bmw m4 pan.MOV',
+    url: '/bmw m4 pan.mp4',
     poster: '/posters/bmw-m4-pan-poster.jpg',
     durationMs: 7500,
     bgPosition: 'center 50%',
@@ -201,15 +201,18 @@ export const Hero: React.FC<HeroProps> = ({
               {item.type === 'video' ? (
                 <video
                   ref={(el) => (videoRefs.current[idx] = el)}
-                  src={encodeURI(item.url)}
                   poster={item.poster ? encodeURI(item.poster) : undefined}
                   muted
                   loop
                   playsInline
+                  autoPlay
                   preload="auto"
                   className="w-full h-full object-cover"
                   style={{ objectPosition: item.bgPosition || 'center center' }}
-                />
+                >
+                  <source src={encodeURI(item.url)} type="video/mp4" />
+                  <source src={encodeURI(item.url.replace('.mp4', '.MOV'))} type="video/quicktime" />
+                </video>
               ) : (
                 <div
                   className="w-full h-full bg-cover bg-no-repeat"
