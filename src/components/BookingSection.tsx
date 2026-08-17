@@ -372,14 +372,40 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
           .join('\n')
       };
 
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
+      // Attempt submission: tries /submit proxy (if configured in Cloudflare Worker) or direct Web3Forms API
+      let response: Response;
+      try {
+        response = await fetch('/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        // If /submit returned 404 or 405 (proxy not set up in Worker yet), fall back to direct Web3Forms
+        if (response.status === 404 || response.status === 405) {
+          response = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+        }
+      } catch {
+        // If relative /submit failed due to network, fall back to direct Web3Forms
+        response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+      }
 
       const result = await response.json();
 
