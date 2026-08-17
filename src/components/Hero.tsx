@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MapPin, Star, Calendar, ArrowRight, Shield } from 'lucide-react';
+import { MapPin, Star, Calendar, ArrowRight } from 'lucide-react';
 
 interface HeroProps {
   onExploreClick: () => void;
@@ -198,18 +198,13 @@ export const Hero: React.FC<HeroProps> = ({
           </button>
         </motion.div>
 
-        {/* Mobile Unit Guarantees */}
+        {/* Guarantees */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.6 }}
           className="mt-12 flex flex-wrap justify-center items-center gap-6 text-xs sm:text-sm font-medium text-slate-400"
         >
-          <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-blue-400" />
-            <span>100% Mobile Service — We Come To You</span>
-          </div>
-          <span className="hidden sm:inline text-slate-700">•</span>
           <div className="flex items-center gap-2">
             <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
             <span>Satisfaction Guaranteed</span>

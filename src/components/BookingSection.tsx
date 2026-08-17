@@ -347,6 +347,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
         multi_vehicle_discount: totalDiscount > 0 ? `$${totalDiscount} discount applied` : 'None',
         special_notes: formData.notes.trim() || 'None',
         policy_verified: 'Yes (Confirmed $10 personal belongings policy & service terms)',
+        botcheck: false,
         message: [
           `NEW BOOKING REQUEST`,
           `=================================`,
@@ -372,8 +373,10 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
           .join('\n')
       };
 
-      // Attempt submission: tries /submit proxy (if configured in Cloudflare Worker) or direct Web3Forms API
+      // Try local Cloudflare Worker /submit first, fallback to direct Web3Forms
       let response: Response;
+      let result: any = null;
+
       try {
         response = await fetch('/submit', {
           method: 'POST',
@@ -384,19 +387,16 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
           body: JSON.stringify(payload)
         });
 
-        // If /submit returned 404 or 405 (proxy not set up in Worker yet), fall back to direct Web3Forms
-        if (response.status === 404 || response.status === 405) {
-          response = await fetch('https://api.web3forms.com/submit', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json'
-            },
-            body: JSON.stringify(payload)
-          });
+        // If /submit returned JSON from worker
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          result = await response.json().catch(() => null);
+        } else {
+          // If returned HTML (SPA fallback), do direct Web3Forms
+          throw new Error('Not an API response');
         }
       } catch {
-        // If relative /submit failed due to network, fall back to direct Web3Forms
+        // Fallback to direct Web3Forms API
         response = await fetch('https://api.web3forms.com/submit', {
           method: 'POST',
           headers: {
@@ -405,14 +405,14 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
           },
           body: JSON.stringify(payload)
         });
+        result = await response.json().catch(() => null);
       }
 
-      const result = await response.json();
-
-      if (result.success) {
+      if (response.ok && result?.success) {
         setSubmitted(true);
       } else {
-        setErrorMsg(result.message || 'There was an issue sending your booking request. You can also text or call Gavin directly at (512) 589-6977.');
+        const errorDetail = result?.message || 'Submission was not accepted by the mail server.';
+        setErrorMsg(`${errorDetail} You can also book immediately by calling or texting Gavin directly at (512) 589-6977.`);
         scrollToMissingField('booking-form-error');
       }
     } catch (error) {
