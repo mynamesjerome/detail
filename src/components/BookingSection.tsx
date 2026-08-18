@@ -333,7 +333,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
 
     try {
       const payload = {
-        access_key: WEB3FORMS_ACCESS_KEY,
+        access_key: WEB3FORMS_ACCESS_KEY || "006f9973-ea8a-4c27-8a44-094a2ac474eb",
         subject: `New Detailing Request from ${formData.fullName} - Gavin's Car Detailing`,
         from_name: "Gavin's Car Detailing Web Booking",
         name: formData.fullName,
@@ -349,7 +349,6 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
         multi_vehicle_discount: totalDiscount > 0 ? `$${totalDiscount} discount applied` : 'None',
         special_notes: formData.notes.trim() || 'None',
         policy_verified: 'Yes (Confirmed $10 personal belongings policy & service terms)',
-        botcheck: false,
         message: [
           `NEW BOOKING REQUEST`,
           `=================================`,
