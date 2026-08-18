@@ -375,40 +375,20 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
           .join('\n')
       };
 
-      // Try local Cloudflare Worker /submit first, fallback to direct Web3Forms
-      let response: Response;
-      let result: any = null;
+      console.log('[Booking Form] Submitting payload directly to https://api.web3forms.com/submit:', payload);
 
-      try {
-        response = await fetch('/submit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
+      // Direct Web3Forms submission
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
 
-        // If /submit returned JSON from worker
-        const contentType = response.headers.get('content-type') || '';
-        if (contentType.includes('application/json')) {
-          result = await response.json().catch(() => null);
-        } else {
-          // If returned HTML (SPA fallback), do direct Web3Forms
-          throw new Error('Not an API response');
-        }
-      } catch {
-        // Fallback to direct Web3Forms API
-        response = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-        result = await response.json().catch(() => null);
-      }
+      const result = await response.json().catch(() => null);
+      console.log('[Booking Form] Web3Forms response:', response.status, result);
 
       if (response.ok && result?.success) {
         setSubmitted(true);
@@ -571,7 +551,14 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                 </button>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} noValidate className="space-y-6">
+              <form
+                id="booking-form"
+                action="https://api.web3forms.com/submit"
+                method="POST"
+                onSubmit={handleSubmit}
+                noValidate
+                className="space-y-6"
+              >
                 
                 {errorMsg && (
                   <div id="booking-form-error" className="p-4 rounded-2xl bg-red-900/40 border border-red-500/60 text-red-200 text-xs font-semibold flex items-center gap-2 animate-shake">
@@ -1172,6 +1159,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
 
                 <button
                   type="submit"
+                  form="booking-form"
                   disabled={isSubmitting}
                   className={`w-full py-4 px-6 rounded-2xl font-bold text-base text-white transition-all flex items-center justify-center gap-2 shadow-xl ${
                     isSubmitting
