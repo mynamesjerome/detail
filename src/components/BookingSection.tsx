@@ -20,11 +20,7 @@ import {
   Crown,
   RefreshCw,
   Layers,
-  Loader2,
-  Key,
-  Settings,
-  ExternalLink,
-  Check
+  Loader2
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -98,21 +94,8 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isCaptchaOpen, setIsCaptchaOpen] = useState(false);
-  const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
 
-  // Allow custom access key saved in localStorage or from env
-  const [customKey, setCustomKey] = useState(() => {
-    try {
-      return localStorage.getItem('gavin_web3forms_key') || '';
-    } catch {
-      return '';
-    }
-  });
-
-  const WEB3FORMS_ACCESS_KEY =
-    customKey.trim() ||
-    (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_WEB3FORMS_ACCESS_KEY) ||
-    '006f9973-ea8a-4c27-8a44-094a2ac474eb';
+  const WEB3FORMS_ACCESS_KEY = '006f9973-ea8a-4c27-8a44-094a2ac474eb';
 
   // Sync initial single vehicle selection if changed from hero/cards/maintenance
   const selectedAddOnIdsKey = selectedAddOnIds.slice().sort().join(',');
@@ -339,43 +322,18 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
       scrollToMissingField('input-address');
       return;
     }
-
-    // Ensure policy agreement is recorded
     if (!formData.policyAgreed) {
-      setFormData(prev => ({ ...prev, policyAgreed: true }));
-      onTogglePolicyAgree(true);
+      setErrorMsg('Please complete the Captcha Policy Verification ($10 belongings fee & terms).');
+      setIsCaptchaOpen(true);
+      scrollToMissingField('captcha-verify-btn');
+      return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const summaryMsg = [
-        `NEW BOOKING REQUEST`,
-        `=================================`,
-        `Client: ${formData.fullName}`,
-        `Phone: ${formData.phone}`,
-        `Email: ${formData.email.trim() || 'Not Provided'}`,
-        `Service Address: ${formData.austinAddress}`,
-        `Schedule: ${formData.preferredDate || 'ASAP'} (${formData.preferredTime})`,
-        `Service Type: ${planTypeLabel}`,
-        ``,
-        `VEHICLES & SERVICES (${vehicles.length} Vehicle${vehicles.length > 1 ? 's' : ''}):`,
-        vehicleSummaryText,
-        ``,
-        `ESTIMATE SUMMARY:`,
-        `• 1st Visit Total: $${grandTotal}`,
-        isMaintenanceMode ? `• Recurring VIP Rate: $${recurringGrandTotal}/visit` : '',
-        totalDiscount > 0 ? `• Multi-Car Discount Applied: Saved $${totalDiscount}` : '',
-        ``,
-        `Special Notes: ${formData.notes.trim() || 'None'}`,
-        `Policy Status: Confirmed ($10 belongings fee & terms accepted)`
-      ]
-        .filter(Boolean)
-        .join('\n');
-
       const payload = {
         access_key: WEB3FORMS_ACCESS_KEY,
-        apikey: WEB3FORMS_ACCESS_KEY,
         subject: `New Detailing Request from ${formData.fullName} - Gavin's Car Detailing`,
         from_name: "Gavin's Car Detailing Web Booking",
         name: formData.fullName,
@@ -391,40 +349,78 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
         multi_vehicle_discount: totalDiscount > 0 ? `$${totalDiscount} discount applied` : 'None',
         special_notes: formData.notes.trim() || 'None',
         policy_verified: 'Yes (Confirmed $10 personal belongings policy & service terms)',
-        message: summaryMsg
+        botcheck: false,
+        message: [
+          `NEW BOOKING REQUEST`,
+          `=================================`,
+          `Client: ${formData.fullName}`,
+          `Phone: ${formData.phone}`,
+          `Email: ${formData.email.trim() || 'N/A'}`,
+          `Service Address: ${formData.austinAddress}`,
+          `Schedule: ${formData.preferredDate || 'ASAP'} (${formData.preferredTime})`,
+          `Service Type: ${planTypeLabel}`,
+          ``,
+          `VEHICLES & SERVICES (${vehicles.length} Vehicle${vehicles.length > 1 ? 's' : ''}):`,
+          vehicleSummaryText,
+          ``,
+          `ESTIMATE SUMMARY:`,
+          `• 1st Visit Total: $${grandTotal}`,
+          isMaintenanceMode ? `• Recurring VIP Rate: $${recurringGrandTotal}/visit` : '',
+          totalDiscount > 0 ? `• Multi-Car Discount Applied: Saved $${totalDiscount}` : '',
+          ``,
+          `Special Notes: ${formData.notes.trim() || 'None'}`,
+          `Policy Status: Captcha Verified ($10 belongings fee & terms accepted)`
+        ]
+          .filter(Boolean)
+          .join('\n')
       };
 
-      // Direct client-side submission to Web3Forms API (JSON with FormData fallback)
+      // Try local Cloudflare Worker /submit first, fallback to direct Web3Forms
+      let response: Response;
+      let result: any = null;
+
       try {
-        const response = await fetch('https://api.web3forms.com/submit', {
+        response = await fetch('/submit', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Accept: 'application/json',
+            Accept: 'application/json'
           },
           body: JSON.stringify(payload)
         });
-        const resData = await response.json().catch(() => null);
-        console.log('Web3Forms JSON submission response:', { status: response.status, data: resData });
-      } catch (err) {
-        console.warn('Web3Forms JSON attempt failed, trying FormData fallback:', err);
-        try {
-          const formDataObj = new FormData();
-          Object.entries(payload).forEach(([k, v]) => formDataObj.append(k, String(v)));
-          await fetch('https://api.web3forms.com/submit', {
-            method: 'POST',
-            headers: { Accept: 'application/json' },
-            body: formDataObj
-          });
-        } catch (fallbackErr) {
-          console.warn('Web3Forms FormData fallback error:', fallbackErr);
+
+        // If /submit returned JSON from worker
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          result = await response.json().catch(() => null);
+        } else {
+          // If returned HTML (SPA fallback), do direct Web3Forms
+          throw new Error('Not an API response');
         }
+      } catch {
+        // Fallback to direct Web3Forms API
+        response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+        result = await response.json().catch(() => null);
       }
 
-      setSubmitted(true);
+      if (response.ok && result?.success) {
+        setSubmitted(true);
+      } else {
+        const errorDetail = result?.message || 'Submission was not accepted by the mail server.';
+        setErrorMsg(`${errorDetail} You can also book immediately by calling or texting Gavin directly at (512) 589-6977.`);
+        scrollToMissingField('booking-form-error');
+      }
     } catch (error) {
-      console.error('Web3Forms submission handler:', error);
-      setSubmitted(true);
+      console.error('Web3Forms submission error:', error);
+      setErrorMsg('Network error while sending request. You can also reach Gavin directly at (512) 589-6977.');
+      scrollToMissingField('booking-form-error');
     } finally {
       setIsSubmitting(false);
     }
@@ -452,86 +448,6 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
             setFormData((prev) => ({ ...prev, policyAgreed: true }));
           }}
         />
-
-        {/* Web3Forms Access Key Settings Modal */}
-        {isKeyModalOpen && (
-          <div
-            onClick={() => setIsKeyModalOpen(false)}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md"
-          >
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl text-white space-y-4"
-            >
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div className="flex items-center gap-2">
-                  <Key className="w-5 h-5 text-blue-400" />
-                  <h3 className="text-base font-bold text-white">Email & Web3Forms Settings</h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsKeyModalOpen(false)}
-                  className="text-slate-400 hover:text-white p-1"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Web3Forms delivers booking requests straight to your email inbox without needing a custom backend server.
-              </p>
-
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
-                  Your Web3Forms Access Key (UUID)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. 006f9973-ea8a-4c27-8a44-094a2ac474eb"
-                  value={customKey}
-                  onChange={(e) => setCustomKey(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 font-mono"
-                />
-                <p className="text-[11px] text-slate-400">
-                  Active key: <span className="text-blue-400 font-mono">{WEB3FORMS_ACCESS_KEY.slice(0, 8)}...</span>
-                </p>
-              </div>
-
-              <div className="p-3 rounded-xl bg-blue-950/40 border border-blue-800/60 text-[11px] text-blue-200 space-y-1">
-                <p className="font-bold flex items-center gap-1">
-                  <span>How to get your free key in 5 seconds:</span>
-                </p>
-                <p>1. Go to <strong>web3forms.com</strong></p>
-                <p>2. Enter your email (where you want client bookings delivered)</p>
-                <p>3. Paste the Access Key received in your inbox here and click Save.</p>
-              </div>
-
-              <div className="flex items-center gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    try {
-                      localStorage.setItem('gavin_web3forms_key', customKey.trim());
-                    } catch {}
-                    setIsKeyModalOpen(false);
-                  }}
-                  className="flex-1 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md transition-colors"
-                >
-                  Save Access Key
-                </button>
-                <a
-                  href="https://web3forms.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs inline-flex items-center gap-1 transition-colors"
-                >
-                  <span>Get Free Key</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Section Header */}
         <motion.div 
@@ -655,22 +571,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                 </button>
               </motion.div>
             ) : (
-              <form
-                action="https://api.web3forms.com/submit"
-                method="POST"
-                onSubmit={handleSubmit}
-                noValidate
-                className="space-y-6"
-              >
-                {/* Web3Forms Serverless HTML Configuration */}
-                <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
-                <input type="hidden" name="apikey" value={WEB3FORMS_ACCESS_KEY} />
-                <input type="hidden" name="subject" value={`New Detailing Request from ${formData.fullName || 'Client'} - Gavin's Car Detailing`} />
-                <input type="hidden" name="from_name" value="Gavin's Car Detailing Web Booking" />
-                <input type="hidden" name="service_type" value={planTypeLabel} />
-                <input type="hidden" name="service_address" value={formData.austinAddress} />
-                <input type="hidden" name="first_visit_total" value={`$${grandTotal}`} />
-                <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
+              <form onSubmit={handleSubmit} noValidate className="space-y-6">
                 
                 {errorMsg && (
                   <div id="booking-form-error" className="p-4 rounded-2xl bg-red-900/40 border border-red-500/60 text-red-200 text-xs font-semibold flex items-center gap-2 animate-shake">
@@ -694,9 +595,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                         <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
                           id="input-fullname"
-                          name="name"
                           type="text"
-                          required
                           placeholder="John Doe"
                           value={formData.fullName}
                           onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
@@ -715,9 +614,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                         <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
                           id="input-phone"
-                          name="phone"
                           type="tel"
-                          required
                           placeholder="(512) 589-6977"
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -736,9 +633,8 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                     <div className="relative">
                       <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
-                        id="input-email"
-                        name="email"
-                        type="email"
+                        type="text"
+                        inputMode="email"
                         placeholder="john@example.com (Optional)"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -1138,9 +1034,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                       <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         id="input-address"
-                        name="address"
                         type="text"
-                        required
                         placeholder="e.g. 1234 Main St, Austin, TX 78704 (or driveway location)"
                         value={formData.austinAddress}
                         onChange={(e) => setFormData({ ...formData, austinAddress: e.target.value })}
@@ -1166,7 +1060,6 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                       <div className="relative w-full min-w-0">
                         <input
                           id="input-date"
-                          name="preferred_date"
                           type="date"
                           min={todayStr}
                           value={formData.preferredDate}
@@ -1220,7 +1113,6 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                       Special Requests / Vehicle Condition Notes
                     </label>
                     <textarea
-                      name="message"
                       rows={2}
                       placeholder="e.g. Heavy pet hair in back seat, or stain on driver seat"
                       value={formData.notes}
@@ -1229,46 +1121,34 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                     />
                   </div>
 
-                  {/* Policy Verification Checkbox Box */}
+                  {/* Captcha Verification Trigger Box */}
                   <div
                     id="captcha-verify-btn"
-                    onClick={() => {
-                      const next = !formData.policyAgreed;
-                      setFormData({ ...formData, policyAgreed: next });
-                      onTogglePolicyAgree(next);
-                    }}
+                    onClick={() => setIsCaptchaOpen(true)}
                     className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between group ${
                       formData.policyAgreed
                         ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-200'
+                        : errorMsg.includes('Captcha')
+                        ? 'bg-red-950/40 border-red-500 ring-1 ring-red-500 text-red-200'
                         : 'bg-slate-950 border-slate-700 text-slate-300 hover:border-blue-500'
                     }`}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5">
-                        {formData.policyAgreed ? (
-                          <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
-                        ) : (
-                          <div className="w-5 h-5 rounded-md border border-slate-500 flex items-center justify-center bg-slate-900 group-hover:border-blue-400">
-                            <span className="w-2 h-2 rounded-sm bg-transparent" />
-                          </div>
-                        )}
-                      </div>
+                    <div className="flex items-center gap-3">
+                      {formData.policyAgreed ? (
+                        <ShieldCheck className="w-6 h-6 text-emerald-400 shrink-0" />
+                      ) : (
+                        <Lock className="w-6 h-6 text-blue-400 shrink-0 group-hover:scale-110 transition-transform" />
+                      )}
                       <div>
-                        <span className="text-xs sm:text-sm font-bold block text-white">
-                          I agree to the <strong className="text-amber-300">$10 Belongings Clearance Fee</strong> & Terms
+                        <span className="text-xs sm:text-sm font-bold block">
+                          {formData.policyAgreed
+                            ? '✓ Service Policy Captcha Verified'
+                            : 'Click Here: Verify Service Policy ($10 Belongings Fee)'}
                         </span>
-                        <span className="text-[11px] text-slate-400 block mt-0.5">
-                          Personal items must be removed prior to arrival. Severe pet hair or heavy mud quoted on inspection.{' '}
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setIsCaptchaOpen(true);
-                            }}
-                            className="text-blue-400 hover:text-blue-300 underline font-medium cursor-pointer"
-                          >
-                            Read full policy terms
-                          </button>
+                        <span className="text-[11px] text-slate-400 block">
+                          {formData.policyAgreed
+                            ? 'You verified the $10 uncleared belongings fee & inspection terms.'
+                            : 'Requires quick 2-step Captcha verification popup to confirm terms.'}
                         </span>
                       </div>
                     </div>
@@ -1277,17 +1157,15 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        const next = !formData.policyAgreed;
-                        setFormData({ ...formData, policyAgreed: next });
-                        onTogglePolicyAgree(next);
+                        setIsCaptchaOpen(true);
                       }}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ml-2 ${
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
                         formData.policyAgreed
                           ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                          : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
+                          : 'bg-blue-600 hover:bg-blue-500 text-white'
                       }`}
                     >
-                      {formData.policyAgreed ? 'Agreed ✓' : 'Agree'}
+                      {formData.policyAgreed ? 'Verified' : 'Verify Policy'}
                     </button>
                   </div>
                 </div>
@@ -1313,18 +1191,6 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                     </>
                   )}
                 </button>
-
-                {/* Email Delivery / Web3Forms Key Config Link */}
-                <div className="pt-2 text-center">
-                  <button
-                    type="button"
-                    onClick={() => setIsKeyModalOpen(true)}
-                    className="inline-flex items-center gap-1.5 text-[11px] text-slate-400 hover:text-blue-300 transition-colors font-medium cursor-pointer"
-                  >
-                    <Key className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Notification Email & Web3Forms Settings</span>
-                  </button>
-                </div>
 
               </form>
             )}

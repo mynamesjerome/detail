@@ -11,6 +11,7 @@ import { ServiceAreaSection } from './components/ServiceAreaSection';
 import { BeforeAfterGallery } from './components/BeforeAfterGallery';
 import { BookingSection } from './components/BookingSection';
 import { Footer } from './components/Footer';
+import { animateScrollTo } from './utils/scroll';
 
 export default function App() {
   const [vehicleType, setVehicleType] = useState<VehicleType>('sedan');
@@ -23,14 +24,11 @@ export default function App() {
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
-      const headerOffset = 80;
+      const headerOffset = 75;
       const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
       const offsetPosition = Math.max(0, elementPosition - headerOffset);
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+      animateScrollTo(offsetPosition, 850);
     }
   };
 

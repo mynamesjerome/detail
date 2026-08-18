@@ -25,26 +25,10 @@ export interface MediaItem {
   id: string;
   type: 'image' | 'video';
   url: string;
-  poster?: string;
   title?: string;
   label?: string;
   fallbackUrl?: string;
 }
-
-export const getVideoPoster = (url: string): string => {
-  const lower = url.toLowerCase();
-  if (lower.includes('corvette')) return '/posters/corvette-poster.jpg';
-  if (lower.includes('bmw m4 foam') || lower.includes('m4 foam')) return '/posters/bmw-m4-foam-poster.jpg';
-  if (lower.includes('bmw m4 pan') || lower.includes('m4 pan')) return '/posters/bmw-m4-pan-poster.jpg';
-  if (lower.includes('bmw 4')) return '/posters/bmw-4-poster.jpg';
-  if (lower.includes('bmw interior') || lower.includes('bmw-interior')) return '/posters/bmw-interior-poster.jpg';
-  if (lower.includes('bmw 5 interior') || lower.includes('bmw 5 interior .mov')) return '/posters/bmw-5-interior-poster.jpg';
-  if (lower.includes('bmw 5 foam')) return '/posters/bmw-5-foam-poster.jpg';
-  if (lower.includes('porsche')) return '/posters/porsche-poster.jpg';
-  if (lower.includes('silver')) return '/posters/silver-poster.jpg';
-  if (lower.includes('explorer')) return '/posters/explorer-foam-poster.jpg';
-  return '/mercedes after.JPG';
-};
 
 export interface VehicleGroup {
   id: string;
@@ -59,6 +43,20 @@ export interface VehicleGroup {
 
 const VEHICLE_GROUPS: VehicleGroup[] = [
   {
+    id: 'bmw-m4',
+    items: [
+      { id: 'bmw-interior', type: 'video', url: '/bmw interior.MOV', title: 'BMW Interior Detail', label: 'INTERIOR' },
+      { id: 'bmw-m4-foam', type: 'video', url: '/bmw m4 foam.MOV', title: 'BMW M4 Snow Foam', label: 'FOAM' },
+      { id: 'bmw-m4-pan', type: 'video', url: '/bmw m4 pan.MOV', title: 'BMW M4 Gloss Pan', label: 'WALKAROUND' }
+    ],
+    aspectRatio: 'aspect-[9/16]',
+    widthClass: 'w-64 sm:w-72',
+    rotation: -2.0,
+    floatDuration: 7.2,
+    yOffset: -10,
+    delay: 0
+  },
+  {
     id: 'aston-martin',
     items: [
       { id: 'aston-1', type: 'image', url: '/aston 1.JPG' },
@@ -70,25 +68,25 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
     rotation: -2.5,
     floatDuration: 7.5,
     yOffset: -12,
-    delay: 0
+    delay: 0.2
   },
   {
-    id: 'bmw-m4-showcase',
+    id: 'bmw-5-series',
     items: [
-      { id: 'bmw-m4-foam', type: 'video', url: '/bmw m4 foam.mp4', poster: '/posters/bmw-m4-foam-poster.jpg', title: 'BMW M4 Snow Foam Bath' },
-      { id: 'bmw-m4-pan', type: 'video', url: '/bmw m4 pan.mp4', poster: '/posters/bmw-m4-pan-poster.jpg', title: 'BMW M4 Exterior Gloss' }
+      { id: 'bmw-5-foam', type: 'video', url: '/bmw 5 foam.MOV' },
+      { id: 'bmw-5-interior', type: 'video', url: '/bmw 5 interior .MOV' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
-    rotation: 2.2,
-    floatDuration: 8.2,
+    rotation: 2.0,
+    floatDuration: 8.0,
     yOffset: 10,
     delay: 0.5
   },
   {
     id: 'corvette',
     items: [
-      { id: 'corvette-ext', type: 'video', url: '/corvette exterior after.mp4', poster: '/posters/corvette-poster.jpg' }
+      { id: 'corvette-ext', type: 'video', url: '/corvette exterior after.MOV' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -96,18 +94,6 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
     floatDuration: 6.8,
     yOffset: -10,
     delay: 0.4
-  },
-  {
-    id: 'bmw-interior-showcase',
-    items: [
-      { id: 'bmw-interior-detail', type: 'video', url: '/bmw interior.mp4', poster: '/posters/bmw-interior-poster.jpg', title: 'BMW Interior Precision' }
-    ],
-    aspectRatio: 'aspect-[9/16]',
-    widthClass: 'w-64 sm:w-72',
-    rotation: 1.8,
-    floatDuration: 7.4,
-    yOffset: 8,
-    delay: 0.7
   },
   {
     id: 'mercedes-benz',
@@ -135,21 +121,9 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
     delay: 0.6
   },
   {
-    id: 'bmw-4-series',
-    items: [
-      { id: 'bmw-4-after', type: 'video', url: '/bmw 4 after.mp4', poster: '/posters/bmw-4-poster.jpg' }
-    ],
-    aspectRatio: 'aspect-[9/16]',
-    widthClass: 'w-64 sm:w-72',
-    rotation: -3.0,
-    floatDuration: 7.2,
-    yOffset: -12,
-    delay: 1.0
-  },
-  {
     id: 'porsche',
     items: [
-      { id: 'porsche-after', type: 'video', url: '/porsche after.mp4', poster: '/posters/porsche-poster.jpg' }
+      { id: 'porsche-after', type: 'video', url: '/porsche after.MOV' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -161,7 +135,7 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
   {
     id: 'explorer-foam',
     items: [
-      { id: 'explorer-foam', type: 'video', url: '/explorer foam.mp4', poster: '/posters/explorer-foam-poster.jpg' }
+      { id: 'explorer-foam', type: 'video', url: '/explorer foam.MOV' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -185,7 +159,7 @@ const VEHICLE_GROUPS: VehicleGroup[] = [
   {
     id: 'silver-spec',
     items: [
-      { id: 'silver-after', type: 'video', url: '/silver after.mp4', poster: '/posters/silver-poster.jpg' }
+      { id: 'silver-after', type: 'video', url: '/silver after.MOV' }
     ],
     aspectRatio: 'aspect-[9/16]',
     widthClass: 'w-64 sm:w-72',
@@ -225,14 +199,97 @@ export const BeforeAfterGallery: React.FC = () => {
   const [showVideoControls, setShowVideoControls] = useState<boolean>(true);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const galleryRow1Ref = useRef<HTMLDivElement>(null);
-  const galleryRow2Ref = useRef<HTMLDivElement>(null);
+  const galleryRowRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [dragStartX, setDragStartX] = useState<number>(0);
+  const [scrollStartX, setScrollStartX] = useState<number>(0);
+  const [hasMovedDrag, setHasMovedDrag] = useState<boolean>(false);
 
-  const isInteracting1 = useRef(false);
-  const interactTimeout1 = useRef<NodeJS.Timeout | null>(null);
+  // Seamless looping stream with plenty of cards to scroll in 1 row
+  const showcaseItems = React.useMemo(() => [...VEHICLE_GROUPS, ...VEHICLE_GROUPS], []);
 
-  const isInteracting2 = useRef(false);
-  const interactTimeout2 = useRef<NodeJS.Timeout | null>(null);
+  // Ambient gentle auto-scrolling that only pauses when clicking to drag or opening a modal
+  useEffect(() => {
+    let animationFrameId: number;
+    let lastTime = performance.now();
+
+    const autoScroll = (time: number) => {
+      const delta = time - lastTime;
+      lastTime = time;
+
+      if (!isDragging && galleryRowRef.current && !selectedGroup) {
+        const el = galleryRowRef.current;
+        // Gentle smooth drift
+        const speed = 0.04 * delta;
+        el.scrollLeft += speed;
+
+        // Loop seamlessly when reaching half-way through the duplicated items
+        if (el.scrollLeft >= el.scrollWidth / 2) {
+          el.scrollLeft = 0;
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(autoScroll);
+    };
+
+    animationFrameId = requestAnimationFrame(autoScroll);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [isDragging, selectedGroup]);
+
+  // Mouse wheel horizontal scrolling listener
+  const handleGalleryWheel = (e: React.WheelEvent) => {
+    const el = galleryRowRef.current;
+    if (!el) return;
+
+    // Convert mouse wheel scroll (vertical deltaY or horizontal deltaX) into horizontal scroll
+    const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    if (Math.abs(delta) > 0) {
+      el.scrollLeft += delta;
+      
+      // Loop if out of bounds
+      if (el.scrollLeft >= el.scrollWidth / 2) {
+        el.scrollLeft -= el.scrollWidth / 2;
+      } else if (el.scrollLeft <= 0) {
+        el.scrollLeft += el.scrollWidth / 2;
+      }
+    }
+  };
+
+  // Mouse drag-to-scroll handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const el = galleryRowRef.current;
+    if (!el) return;
+    setIsDragging(true);
+    setHasMovedDrag(false);
+    setDragStartX(e.pageX - el.offsetLeft);
+    setScrollStartX(el.scrollLeft);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const el = galleryRowRef.current;
+    if (!el) return;
+    e.preventDefault();
+    const x = e.pageX - el.offsetLeft;
+    const walk = (x - dragStartX) * 1.5;
+    if (Math.abs(walk) > 5) {
+      setHasMovedDrag(true);
+    }
+    el.scrollLeft = scrollStartX - walk;
+
+    // Loop bounds
+    if (el.scrollLeft >= el.scrollWidth / 2) {
+      el.scrollLeft -= el.scrollWidth / 2;
+      setScrollStartX((prev) => prev - el.scrollWidth / 2);
+    } else if (el.scrollLeft <= 0) {
+      el.scrollLeft += el.scrollWidth / 2;
+      setScrollStartX((prev) => prev + el.scrollWidth / 2);
+    }
+  };
+
+  const handleMouseUpOrLeave = () => {
+    setIsDragging(false);
+  };
 
   // Reset zoom & pan whenever selected item changes
   const resetZoomAndPan = useCallback(() => {
@@ -241,6 +298,39 @@ export const BeforeAfterGallery: React.FC = () => {
   }, []);
 
   const activeMediaItem = selectedGroup ? selectedGroup.items[activeMediaIndex] : null;
+
+  // Lock background page scroll when lightbox modal is open
+  useEffect(() => {
+    if (selectedGroup) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [selectedGroup]);
+
+  // Non-passive wheel event listener so mouse-wheel zoom never scrolls the website
+  useEffect(() => {
+    const el = imageContainerRef.current;
+    if (!el || activeMediaItem?.type === 'video') return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const zoomDelta = e.deltaY < 0 ? 0.3 : -0.3;
+      setZoomLevel((prev) => {
+        const next = Math.min(Math.max(prev + zoomDelta, 1), 4);
+        if (next === 1) setPanOffset({ x: 0, y: 0 });
+        return next;
+      });
+    };
+
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      el.removeEventListener('wheel', handleWheel);
+    };
+  }, [selectedGroup, activeMediaItem]);
 
   useEffect(() => {
     resetZoomAndPan();
@@ -341,17 +431,6 @@ export const BeforeAfterGallery: React.FC = () => {
   const handleZoomOut = () => {
     setZoomLevel((prev) => {
       const next = Math.max(prev - 0.5, 1);
-      if (next === 1) setPanOffset({ x: 0, y: 0 });
-      return next;
-    });
-  };
-
-  const handleWheelZoom = (e: React.WheelEvent) => {
-    if (activeMediaItem?.type === 'video') return;
-    e.preventDefault();
-    const zoomDelta = e.deltaY < 0 ? 0.25 : -0.25;
-    setZoomLevel((prev) => {
-      const next = Math.min(Math.max(prev + zoomDelta, 1), 4);
       if (next === 1) setPanOffset({ x: 0, y: 0 });
       return next;
     });
@@ -465,175 +544,30 @@ export const BeforeAfterGallery: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedGroup, activeMediaItem, duration, isMuted, zoomLevel]);
 
-  // Duplicated arrays for continuous infinite scrolling in both directions
-  const row1Photos = [
-    ...VEHICLE_GROUPS.slice(0, 5),
-    ...VEHICLE_GROUPS.slice(0, 5),
-    ...VEHICLE_GROUPS.slice(0, 5)
-  ];
-  const row2Photos = [
-    ...VEHICLE_GROUPS.slice(5),
-    ...VEHICLE_GROUPS.slice(5),
-    ...VEHICLE_GROUPS.slice(5)
-  ];
-
-  // Infinite Seamless Scrolling Effect
-  useEffect(() => {
-    let animId: number;
-    const speed1 = 0.55;
-    const speed2 = -0.55;
-
-    // Center starting positions smoothly
-    if (galleryRow1Ref.current && galleryRow1Ref.current.scrollWidth > 0) {
-      galleryRow1Ref.current.scrollLeft = galleryRow1Ref.current.scrollWidth / 3;
-    }
-    if (galleryRow2Ref.current && galleryRow2Ref.current.scrollWidth > 0) {
-      galleryRow2Ref.current.scrollLeft = galleryRow2Ref.current.scrollWidth / 3;
-    }
-
-    const scrollLoop = () => {
-      if (galleryRow1Ref.current && !isInteracting1.current) {
-        const el1 = galleryRow1Ref.current;
-        el1.scrollLeft += speed1;
-        const oneThird1 = el1.scrollWidth / 3;
-        if (oneThird1 > 0 && el1.scrollLeft >= oneThird1 * 2) {
-          el1.scrollLeft -= oneThird1;
-        } else if (oneThird1 > 0 && el1.scrollLeft <= 0) {
-          el1.scrollLeft += oneThird1;
-        }
-      }
-
-      if (galleryRow2Ref.current && !isInteracting2.current) {
-        const el2 = galleryRow2Ref.current;
-        el2.scrollLeft += speed2;
-        const oneThird2 = el2.scrollWidth / 3;
-        if (oneThird2 > 0 && el2.scrollLeft <= 5) {
-          el2.scrollLeft += oneThird2;
-        } else if (oneThird2 > 0 && el2.scrollLeft >= oneThird2 * 2) {
-          el2.scrollLeft -= oneThird2;
-        }
-      }
-
-      animId = requestAnimationFrame(scrollLoop);
-    };
-
-    animId = requestAnimationFrame(scrollLoop);
-
-    const el1 = galleryRow1Ref.current;
-    const el2 = galleryRow2Ref.current;
-
-    const setupInteractivity = (
-      el: HTMLDivElement | null,
-      interactionRef: React.MutableRefObject<boolean>,
-      timeoutRef: React.MutableRefObject<NodeJS.Timeout | null>
-    ) => {
-      if (!el) return () => {};
-
-      let isDragging = false;
-      let startX = 0;
-      let startScrollLeft = 0;
-
-      const markInteraction = (duration = 3500) => {
-        interactionRef.current = true;
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        timeoutRef.current = setTimeout(() => {
-          interactionRef.current = false;
-        }, duration);
-      };
-
-      // Desktop: pause on mouse hover, resume on mouse leave
-      const onMouseEnter = () => {
-        interactionRef.current = true;
-      };
-
-      const onMouseLeave = () => {
-        if (!isDragging) {
-          interactionRef.current = false;
-        }
-      };
-
-      // Desktop mouse drag
-      const onMouseDown = (e: MouseEvent) => {
-        isDragging = true;
-        startX = e.clientX;
-        startScrollLeft = el.scrollLeft;
-        interactionRef.current = true;
-      };
-
-      const onMouseMove = (e: MouseEvent) => {
-        if (isDragging) {
-          const dx = e.clientX - startX;
-          el.scrollLeft = startScrollLeft - dx;
-          interactionRef.current = true;
-        }
-      };
-
-      const onMouseUp = () => {
-        if (isDragging) {
-          isDragging = false;
-          markInteraction(1500);
-        }
-      };
-
-      // Mobile touch events: allows user to freely swipe horizontally and vertically
-      const onTouchStart = () => {
-        markInteraction(4000);
-      };
-
-      const onTouchMove = () => {
-        markInteraction(4000);
-      };
-
-      const onTouchEnd = () => {
-        markInteraction(3000);
-      };
-
-      el.addEventListener('mouseenter', onMouseEnter);
-      el.addEventListener('mouseleave', onMouseLeave);
-      el.addEventListener('mousedown', onMouseDown);
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
-      el.addEventListener('touchstart', onTouchStart, { passive: true });
-      el.addEventListener('touchmove', onTouchMove, { passive: true });
-      el.addEventListener('touchend', onTouchEnd, { passive: true });
-
-      return () => {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        el.removeEventListener('mouseenter', onMouseEnter);
-        el.removeEventListener('mouseleave', onMouseLeave);
-        el.removeEventListener('mousedown', onMouseDown);
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('mouseup', onMouseUp);
-        el.removeEventListener('touchstart', onTouchStart);
-        el.removeEventListener('touchmove', onTouchMove);
-        el.removeEventListener('touchend', onTouchEnd);
-      };
-    };
-
-    const cleanup1 = setupInteractivity(el1, isInteracting1, interactTimeout1);
-    const cleanup2 = setupInteractivity(el2, isInteracting2, interactTimeout2);
-
-    return () => {
-      cancelAnimationFrame(animId);
-      cleanup1();
-      cleanup2();
-    };
-  }, []);
-
-  const scrollRow = (rowNum: 1 | 2, direction: 'left' | 'right') => {
-    const el = rowNum === 1 ? galleryRow1Ref.current : galleryRow2Ref.current;
-    const interactRef = rowNum === 1 ? isInteracting1 : isInteracting2;
-    const timeoutRef = rowNum === 1 ? interactTimeout1 : interactTimeout2;
+  const scrollRow = (direction: 'left' | 'right') => {
+    const el = galleryRowRef.current;
     if (!el) return;
 
-    interactRef.current = true;
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      interactRef.current = false;
-    }, 4500);
+    const scrollDistance = direction === 'left' ? -480 : 480;
+    const startX = el.scrollLeft;
+    const startTime = performance.now();
+    const duration = 500;
 
-    const scrollAmount = direction === 'left' ? -360 : 360;
-    el.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    const easeOutCubic = (t: number): number => 1 - Math.pow(1 - t, 3);
+
+    const step = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutCubic(progress);
+
+      el.scrollLeft = startX + scrollDistance * easedProgress;
+
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      }
+    };
+
+    requestAnimationFrame(step);
   };
 
   return (
@@ -656,60 +590,65 @@ export const BeforeAfterGallery: React.FC = () => {
             Gavin's Detail Gallery
           </h2>
           <p className="mt-3 text-xs sm:text-sm text-slate-400 font-normal">
-            Swipe left/right or click any vehicle to inspect in full resolution or play high-definition videos with custom speed controls.
+            Swipe or click arrows to browse.
           </p>
 
           {/* Quick Manual Navigation Buttons for Mobile & Desktop */}
-          <div className="mt-4 flex items-center justify-center gap-3">
-            <button
+          <div className="mt-5 flex items-center justify-center gap-3">
+            <motion.button
               type="button"
-              onClick={() => {
-                scrollRow(1, 'left');
-                scrollRow(2, 'right');
-              }}
-              className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-300 hover:text-white shadow-md active:scale-95 transition-all cursor-pointer"
+              whileTap={{ scale: 0.90 }}
+              whileHover={{ scale: 1.05 }}
+              onClick={() => scrollRow('left')}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-200 hover:text-white shadow-lg shadow-black/40 transition-colors cursor-pointer group"
               aria-label="Scroll left"
             >
-              <ChevronLeft className="w-4 h-4 text-blue-400" />
+              <ChevronLeft className="w-4 h-4 text-blue-400 group-hover:-translate-x-0.5 transition-transform" />
               <span>Scroll Left</span>
-            </button>
+            </motion.button>
 
-            <span className="text-[11px] text-slate-500 font-medium px-1">
-              Swipe or use arrows
+            <span className="text-[11px] text-slate-500 font-medium px-2">
+              Swipe or click arrows
             </span>
 
-            <button
+            <motion.button
               type="button"
-              onClick={() => {
-                scrollRow(1, 'right');
-                scrollRow(2, 'left');
-              }}
-              className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-300 hover:text-white shadow-md active:scale-95 transition-all cursor-pointer"
+              whileTap={{ scale: 0.90 }}
+              whileHover={{ scale: 1.05 }}
+              onClick={() => scrollRow('right')}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-200 hover:text-white shadow-lg shadow-black/40 transition-colors cursor-pointer group"
               aria-label="Scroll right"
             >
               <span>Scroll Right</span>
-              <ChevronRight className="w-4 h-4 text-blue-400" />
-            </button>
+              <ChevronRight className="w-4 h-4 text-blue-400 group-hover:translate-x-0.5 transition-transform" />
+            </motion.button>
           </div>
         </motion.div>
       </div>
 
-      {/* Floating Scrapbook Stream Container */}
-      <div className="relative w-full space-y-8 sm:space-y-12 py-2">
-        {/* Left and Right Fade Edge Overlays with quick hover arrow triggers */}
+      {/* Floating Scrapbook Stream Container - 1 Unified Responsive Row */}
+      <div className="relative w-full py-4">
+        {/* Left and Right Fade Edge Overlays */}
         <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-28 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent z-20 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-28 bg-gradient-to-l from-slate-950 via-slate-950/80 to-transparent z-20 pointer-events-none" />
 
-        {/* Stream Row 1 */}
+        {/* Unified Stream Row */}
         <div
-          ref={galleryRow1Ref}
+          ref={galleryRowRef}
+          onWheel={handleGalleryWheel}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUpOrLeave}
+          onMouseLeave={handleMouseUpOrLeave}
           style={{
             touchAction: 'pan-x pan-y',
             WebkitOverflowScrolling: 'touch',
           }}
-          className="flex gap-6 sm:gap-10 w-full overflow-x-auto scrollbar-none py-10 sm:py-14 px-6 sm:px-12 items-center cursor-grab active:cursor-grabbing"
+          className={`flex gap-6 sm:gap-10 w-full overflow-x-auto scrollbar-none py-10 sm:py-14 px-6 sm:px-12 items-center select-none ${
+            isDragging ? 'cursor-grabbing' : 'cursor-grab'
+          }`}
         >
-          {row1Photos.map((group, index) => {
+          {showcaseItems.map((group, index) => {
             const activeIdx = cardActiveIndices[group.id] || 0;
             const currentItem = group.items[activeIdx] || group.items[0];
             const isVideo = currentItem.type === 'video';
@@ -718,8 +657,9 @@ export const BeforeAfterGallery: React.FC = () => {
 
             return (
               <motion.div
-                key={`row1-${group.id}-${index}`}
+                key={`gallery-${group.id}-${index}`}
                 onClick={() => {
+                  if (hasMovedDrag) return;
                   setSelectedGroup(group);
                   setActiveMediaIndex(activeIdx);
                 }}
@@ -743,151 +683,12 @@ export const BeforeAfterGallery: React.FC = () => {
                 {/* Media Container */}
                 <div className={`relative w-full ${group.aspectRatio} rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950 flex items-center justify-center`}>
                   {isVideo ? (
-                    <img
-                      src={currentItem.poster ? encodeURI(currentItem.poster) : getVideoPoster(safeMediaUrl)}
-                      alt="Video Preview"
-                      decoding="async"
-                      loading="lazy"
-                      onError={(e) => {
-                        const target = e.currentTarget;
-                        const fallback = getVideoPoster(safeMediaUrl);
-                        if (!target.src.includes(encodeURI(fallback))) {
-                          target.src = encodeURI(fallback);
-                        } else if (!target.src.includes(encodeURI('/mercedes after.JPG'))) {
-                          target.src = encodeURI('/mercedes after.JPG');
-                        }
-                      }}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105"
-                    />
-                  ) : (
-                    <img
+                    <video
                       src={safeMediaUrl}
-                      alt="Car Detail"
-                      decoding="async"
-                      loading="lazy"
-                      onError={(e) => {
-                        const target = e.currentTarget;
-                        if (currentItem.fallbackUrl && !target.src.includes(encodeURI(currentItem.fallbackUrl))) {
-                          target.src = encodeURI(currentItem.fallbackUrl);
-                        } else if (!target.src.includes(encodeURI('/mercedes after.JPG'))) {
-                          target.src = encodeURI('/mercedes after.JPG');
-                        }
-                      }}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105"
-                    />
-                  )}
-
-                  {/* Top Gloss Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/20 pointer-events-none" />
-
-                  {/* Video Badge & Play Button */}
-                  {isVideo && (
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-blue-600/90 text-white flex items-center justify-center shadow-2xl border border-blue-400/50 backdrop-blur-sm group-hover/card:scale-110 transition-transform">
-                        <Play className="w-6 h-6 fill-white ml-0.5" />
-                      </div>
-                      <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-slate-950/80 text-[10px] font-bold text-blue-300 border border-slate-700 backdrop-blur-sm flex items-center gap-1">
-                        <Film className="w-3 h-3 text-blue-400" />
-                        <span>VIDEO</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Multi-Photo / Multi-Angle Flipping Badge on Card */}
-                  {hasMultiple && (
-                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-slate-950/85 backdrop-blur-md px-2 py-1 rounded-full border border-slate-700/80 z-10 shadow-lg">
-                      <button
-                        type="button"
-                        onClick={(e) => handleCardPrev(e, group)}
-                        className="p-0.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-full transition-colors"
-                        title="Previous angle"
-                      >
-                        <ChevronLeft className="w-3.5 h-3.5" />
-                      </button>
-                      <span className="text-[10px] font-mono font-bold text-blue-400 px-1">
-                        {currentItem.label ? currentItem.label : `${activeIdx + 1} / ${group.items.length}`}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={(e) => handleCardNext(e, group)}
-                        className="p-0.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-full transition-colors"
-                        title="Next angle"
-                      >
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Expand Icon on Hover */}
-                  <div className="absolute bottom-2.5 right-2.5 z-10 opacity-0 group-hover/card:opacity-100 transition-opacity">
-                    <span className="p-1.5 rounded-full bg-slate-950/80 text-blue-400 border border-slate-800 flex items-center justify-center shadow-lg">
-                      <Maximize2 className="w-3.5 h-3.5" />
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {/* Stream Row 2 */}
-        <div
-          ref={galleryRow2Ref}
-          style={{
-            touchAction: 'pan-x pan-y',
-            WebkitOverflowScrolling: 'touch',
-          }}
-          className="flex gap-6 sm:gap-10 w-full overflow-x-auto scrollbar-none py-10 sm:py-14 px-6 sm:px-12 items-center cursor-grab active:cursor-grabbing"
-        >
-          {row2Photos.map((group, index) => {
-            const activeIdx = cardActiveIndices[group.id] || 0;
-            const currentItem = group.items[activeIdx] || group.items[0];
-            const isVideo = currentItem.type === 'video';
-            const hasMultiple = group.items.length > 1;
-            const safeMediaUrl = encodeURI(currentItem.url);
-
-            return (
-              <motion.div
-                key={`row2-${group.id}-${index}`}
-                onClick={() => {
-                  setSelectedGroup(group);
-                  setActiveMediaIndex(activeIdx);
-                }}
-                animate={{
-                  y: [-group.yOffset * 1.15, group.yOffset * 1.25, -group.yOffset * 1.15],
-                  rotate: [group.rotation, group.rotation + (group.rotation >= 0 ? -1.6 : 1.6), group.rotation],
-                }}
-                transition={{
-                  duration: group.floatDuration,
-                  repeat: Infinity,
-                  repeatType: 'reverse',
-                  ease: 'easeInOut',
-                  delay: group.delay + 0.4,
-                }}
-                style={{
-                  marginTop: `${(index % 2 === 0 ? -group.yOffset * 1.3 : group.yOffset * 1.4)}px`,
-                  transformOrigin: 'center center',
-                }}
-                className={`group/card relative cursor-pointer shrink-0 rounded-2xl sm:rounded-3xl p-2.5 sm:p-3 bg-slate-900/90 backdrop-blur-xl border border-slate-800 hover:border-blue-500/70 shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-[1.05] hover:!rotate-0 hover:z-30 ${group.widthClass} ${index % 3 === 0 ? 'mx-3 sm:mx-5' : index % 3 === 1 ? 'mx-1 sm:mx-3' : 'mx-2 sm:mx-4'}`}
-              >
-                {/* Media Container */}
-                <div className={`relative w-full ${group.aspectRatio} rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950 flex items-center justify-center`}>
-                  {isVideo ? (
-                    <img
-                      src={currentItem.poster ? encodeURI(currentItem.poster) : getVideoPoster(safeMediaUrl)}
-                      alt="Video Preview"
-                      decoding="async"
-                      loading="lazy"
-                      onError={(e) => {
-                        const target = e.currentTarget;
-                        const fallback = getVideoPoster(safeMediaUrl);
-                        if (!target.src.includes(encodeURI(fallback))) {
-                          target.src = encodeURI(fallback);
-                        } else if (!target.src.includes(encodeURI('/mercedes after.JPG'))) {
-                          target.src = encodeURI('/mercedes after.JPG');
-                        }
-                      }}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105"
+                      preload="metadata"
+                      muted
+                      playsInline
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <img
@@ -1084,8 +885,7 @@ export const BeforeAfterGallery: React.FC = () => {
                     <video
                       key={activeMediaItem.url}
                       ref={videoRef}
-                      poster={activeMediaItem.poster ? encodeURI(activeMediaItem.poster) : getVideoPoster(activeMediaItem.url)}
-                      preload="auto"
+                      src={encodeURI(activeMediaItem.url)}
                       className="w-full h-full object-contain"
                       playsInline
                       loop
@@ -1101,10 +901,7 @@ export const BeforeAfterGallery: React.FC = () => {
                         }
                       }}
                       onEnded={() => setIsPlaying(false)}
-                    >
-                      <source src={encodeURI(activeMediaItem.url.replace(/\.mov$/i, '.mp4'))} type="video/mp4" />
-                      <source src={encodeURI(activeMediaItem.url.replace(/\.mp4$/i, '.MOV'))} type="video/quicktime" />
-                    </video>
+                    />
 
                     {/* Big Centered Play/Pause Click Overlay */}
                     {(!isPlaying || showVideoControls) && (
@@ -1254,7 +1051,6 @@ export const BeforeAfterGallery: React.FC = () => {
                   /* PHOTO STAGE WITH INTERACTIVE ZOOM & PAN */
                   <div
                     ref={imageContainerRef}
-                    onWheel={handleWheelZoom}
                     onDoubleClick={handleDoubleClick}
                     onPointerDown={handlePanPointerDown}
                     onPointerMove={handlePanPointerMove}

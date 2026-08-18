@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion } from 'motion/react';
-import { Star, Calendar, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { MapPin, Star, Calendar, ArrowRight } from 'lucide-react';
 
 interface HeroProps {
   onExploreClick: () => void;
@@ -11,89 +11,76 @@ interface HeroMediaItem {
   id: string;
   type: 'image' | 'video';
   url: string;
-  poster?: string;
-  durationMs?: number;
   bgPosition?: string;
   name: string;
+  duration?: number;
 }
 
-// High-definition cycling media items: Corvette -> BMW Interior (extended) -> BMW M4 Foam -> BMW M4 Pan -> Mustang -> Rest
+// High-definition cycling media items starting with the requested BMW & Corvette sequence
 const HERO_SHOWCASE_MEDIA: HeroMediaItem[] = [
-  {
-    id: 'corvette-video',
-    type: 'video',
-    url: '/corvette exterior after.mp4',
-    poster: '/posters/corvette-poster.jpg',
-    durationMs: 7000,
-    bgPosition: 'center 50%',
-    name: 'Corvette C8 Exterior Walkaround'
-  },
   {
     id: 'bmw-interior-video',
     type: 'video',
-    url: '/bmw interior.mp4',
-    poster: '/posters/bmw-interior-poster.jpg',
-    durationMs: 11000, // Extended duration to appreciate full cockpit detail
+    url: '/bmw interior.MOV',
     bgPosition: 'center 50%',
     name: 'BMW Interior Precision Detail'
   },
   {
+    id: 'corvette-video',
+    type: 'video',
+    url: '/corvette exterior after.MOV',
+    bgPosition: 'center 50%',
+    name: 'Corvette C8 Exterior Walkaround'
+  },
+  {
     id: 'bmw-m4-foam-video',
     type: 'video',
-    url: '/bmw m4 foam.mp4',
-    poster: '/posters/bmw-m4-foam-poster.jpg',
-    durationMs: 7500,
+    url: '/bmw m4 foam.MOV',
     bgPosition: 'center 50%',
-    name: 'BMW M4 Snow Foam Bath'
+    name: 'BMW M4 Snow Foam Wash'
   },
   {
     id: 'bmw-m4-pan-video',
     type: 'video',
-    url: '/bmw m4 pan.mp4',
-    poster: '/posters/bmw-m4-pan-poster.jpg',
-    durationMs: 7500,
+    url: '/bmw m4 pan.MOV',
     bgPosition: 'center 50%',
-    name: 'BMW M4 Exterior Walkaround'
+    name: 'BMW M4 Gloss Pan & Finish'
+  },
+  {
+    id: 'porsche-video',
+    type: 'video',
+    url: '/porsche after.MOV',
+    bgPosition: 'center 50%',
+    name: 'Porsche 911 Showcase'
   },
   {
     id: 'mustang-after',
     type: 'image',
     url: '/mustang after read this.JPG',
-    durationMs: 6000,
     bgPosition: 'center 68%', // Framed perfectly on Mustang GT front and hood
-    name: 'Mustang GT Deep Gloss Finish'
-  },
-  {
-    id: 'porsche-video',
-    type: 'video',
-    url: '/porsche after.mp4',
-    poster: '/posters/porsche-poster.jpg',
-    durationMs: 7000,
-    bgPosition: 'center 50%',
-    name: 'Porsche 911 Showcase'
+    name: 'Mustang GT Deep Gloss Finish',
+    duration: 5500
   },
   {
     id: 'mercedes-after',
     type: 'image',
     url: '/mercedes after.JPG',
-    durationMs: 6000,
     bgPosition: 'center 32%', // Moved up
-    name: 'Mercedes-Benz Deep Gloss Finish'
+    name: 'Mercedes-Benz Deep Gloss Finish',
+    duration: 5500
   },
   {
     id: 'aston-angled',
     type: 'image',
     url: '/aston 2.JPG',
-    durationMs: 6000,
     bgPosition: 'center 64%', // Angled Aston Martin only
-    name: 'Aston Martin DBX Angled Detail'
+    name: 'Aston Martin DBX Angled Detail',
+    duration: 5500
   },
   {
     id: 'silver-video',
     type: 'video',
-    url: '/silver after.mp4',
-    poster: '/posters/silver-poster.jpg',
-    durationMs: 7000,
+    url: '/silver after.MOV',
     bgPosition: 'center 50%',
     name: 'Silver Sports Coupe Shine'
   },
@@ -101,19 +88,10 @@ const HERO_SHOWCASE_MEDIA: HeroMediaItem[] = [
     id: 'audi-after',
     type: 'image',
     url: '/audi.JPG',
-    durationMs: 6000,
     bgPosition: 'center 60%', // Moved up a little bit as requested
-    name: 'Audi S-Line Front Finish'
+    name: 'Audi S-Line Front Finish',
+    duration: 5500
   },
-  {
-    id: 'bmw-5-foam',
-    type: 'video',
-    url: '/bmw 5 foam.mp4',
-    poster: '/posters/bmw-5-foam-poster.jpg',
-    durationMs: 7000,
-    bgPosition: 'center 50%',
-    name: 'BMW 5-Series Foam Bath'
-  }
 ];
 
 export const Hero: React.FC<HeroProps> = ({
@@ -121,8 +99,6 @@ export const Hero: React.FC<HeroProps> = ({
   onBookClick
 }) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-  const [prevMediaIndex, setPrevMediaIndex] = useState<number | null>(null);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   // Preload showcase background images
   useEffect(() => {
@@ -134,106 +110,69 @@ export const Hero: React.FC<HeroProps> = ({
     });
   }, []);
 
-  // Slide rotation & video playback management
+  const goToNextMedia = () => {
+    setCurrentMediaIndex((prev) => (prev + 1) % HERO_SHOWCASE_MEDIA.length);
+  };
+
+  // For images, automatically transition after their duration.
+  // For videos, onEnded handles progression, with a 20s safety fallback.
   useEffect(() => {
     const currentItem = HERO_SHOWCASE_MEDIA[currentMediaIndex];
-    
-    // Play active video smoothly
-    if (currentItem.type === 'video') {
-      const vid = videoRefs.current[currentMediaIndex];
-      if (vid) {
-        vid.muted = true;
-        // Only seek to beginning if the video is currently paused/stopped
-        if (vid.paused) {
-          vid.currentTime = 0;
-          const playPromise = vid.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(() => {});
-          }
-        }
-      }
+    if (currentItem.type === 'image') {
+      const timer = setTimeout(() => {
+        goToNextMedia();
+      }, currentItem.duration || 5500);
+      return () => clearTimeout(timer);
+    } else {
+      // Safety timeout in case a video fails to play or doesn't fire onEnded
+      const safetyTimer = setTimeout(() => {
+        goToNextMedia();
+      }, 20000);
+      return () => clearTimeout(safetyTimer);
     }
-
-    // Schedule next slide after duration completes
-    const duration = currentItem.durationMs || 6000;
-    const nextTimer = setTimeout(() => {
-      setPrevMediaIndex(currentMediaIndex);
-      setCurrentMediaIndex((prev) => (prev + 1) % HERO_SHOWCASE_MEDIA.length);
-    }, duration);
-
-    return () => {
-      clearTimeout(nextTimer);
-    };
   }, [currentMediaIndex]);
 
-  // Pause and reset previous slide's video after cross-fade completes
-  useEffect(() => {
-    if (prevMediaIndex === null) return;
-    const cleanupTimer = setTimeout(() => {
-      const prevItem = HERO_SHOWCASE_MEDIA[prevMediaIndex];
-      if (prevItem && prevItem.type === 'video') {
-        const prevVid = videoRefs.current[prevMediaIndex];
-        if (prevVid) {
-          prevVid.pause();
-          prevVid.currentTime = 0;
-        }
-      }
-    }, 1500);
-
-    return () => clearTimeout(cleanupTimer);
-  }, [prevMediaIndex]);
+  const currentMedia = HERO_SHOWCASE_MEDIA[currentMediaIndex];
 
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-28 sm:pt-32 pb-20 sm:pb-24 overflow-hidden bg-slate-950 text-white">
-      {/* Background Image/Video Slider with silky-smooth layered cross-dissolve */}
-      <div className="absolute inset-0 z-0 overflow-hidden bg-slate-950">
-        {HERO_SHOWCASE_MEDIA.map((item, idx) => {
-          const isActive = idx === currentMediaIndex;
-          const isPrev = idx === prevMediaIndex;
-
-          return (
-            <div
-              key={item.id}
-              style={{
-                zIndex: isActive ? 20 : isPrev ? 10 : 0,
-                opacity: isActive ? 1 : isPrev ? 1 : 0,
-                transition: 'opacity 1400ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-                willChange: 'opacity',
-                transform: 'translateZ(0)',
-              }}
-              className="absolute inset-0 overflow-hidden pointer-events-none"
-            >
-              {item.type === 'video' ? (
-                <video
-                  ref={(el) => (videoRefs.current[idx] = el)}
-                  poster={item.poster ? encodeURI(item.poster) : undefined}
-                  muted
-                  loop
-                  playsInline
-                  autoPlay
-                  preload="auto"
-                  className="w-full h-full object-cover"
-                  style={{ objectPosition: item.bgPosition || 'center center' }}
-                >
-                  <source src={encodeURI(item.url.replace(/\.mov$/i, '.mp4'))} type="video/mp4" />
-                  <source src={encodeURI(item.url.replace(/\.mp4$/i, '.MOV'))} type="video/quicktime" />
-                </video>
-              ) : (
-                <div
-                  className="w-full h-full bg-cover bg-no-repeat"
-                  style={{
-                    backgroundImage: `url("${encodeURI(item.url)}")`,
-                    backgroundPosition: item.bgPosition || 'center 50%',
-                  }}
-                />
-              )}
-            </div>
-          );
-        })}
+      {/* Background Image/Video Slider with smooth cross-fade and custom vehicle framing */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={currentMedia.id}
+            initial={{ opacity: 0, scale: 1.04 }}
+            animate={{ opacity: 1, scale: 1.0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: 'easeInOut' }}
+            className="absolute inset-0 overflow-hidden"
+          >
+            {currentMedia.type === 'video' ? (
+              <video
+                key={currentMedia.url}
+                src={encodeURI(currentMedia.url)}
+                autoPlay
+                muted
+                playsInline
+                onEnded={goToNextMedia}
+                className="w-full h-full object-cover"
+                style={{ objectPosition: currentMedia.bgPosition || 'center center' }}
+              />
+            ) : (
+              <div
+                className="w-full h-full bg-cover bg-no-repeat"
+                style={{
+                  backgroundImage: `url("${encodeURI(currentMedia.url)}")`,
+                  backgroundPosition: currentMedia.bgPosition || 'center 50%',
+                }}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
 
         {/* Atmospheric Gradient Overlay - low opacity so cars and videos are vivid and cinematic */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/20 pointer-events-none z-30" />
-        <div className="absolute inset-0 bg-black/15 pointer-events-none z-30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/20 pointer-events-none" />
+        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center flex flex-col items-center">
@@ -291,7 +230,7 @@ export const Hero: React.FC<HeroProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.6 }}
-          className="mt-12 flex flex-wrap justify-center items-center gap-6 text-xs sm:text-sm font-medium text-slate-400"
+          className="mt-8 flex flex-wrap justify-center items-center gap-6 text-xs sm:text-sm font-medium text-slate-400"
         >
           <div className="flex items-center gap-2">
             <Star className="w-4 h-4 text-amber-400 fill-amber-400" />

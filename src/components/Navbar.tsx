@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Logo } from './Logo';
 import { Phone, Calendar, Menu, X, MapPin, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { animateScrollTo } from '../utils/scroll';
 
 interface NavbarProps {
   onBookClick: () => void;
@@ -24,31 +25,35 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookClick }) => {
     setTimeout(() => {
       const element = document.getElementById(id);
       if (element) {
-        const headerOffset = 70;
+        const headerOffset = 75;
         const bodyRect = document.body.getBoundingClientRect().top;
         const elementRect = element.getBoundingClientRect().top;
         const elementPosition = elementRect - bodyRect;
         const offsetPosition = Math.max(0, elementPosition - headerOffset);
 
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
-        });
+        animateScrollTo(offsetPosition, 850);
       }
     }, 50);
+  };
+
+  const scrollToTop = () => {
+    setMobileMenuOpen(false);
+    animateScrollTo(0, 850);
   };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950 border-b border-slate-800 shadow-xl py-3 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          {/* Logo (Bigger) */}
-          <a
-            href="#"
-            className="group flex items-center gap-2 focus:outline-none rounded-xl p-1"
+          {/* Logo (Bigger) with Smooth Scroll to Top */}
+          <button
+            type="button"
+            onClick={scrollToTop}
+            className="group flex items-center gap-2 focus:outline-none rounded-xl p-1 cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] text-left"
+            aria-label="Scroll back to top"
           >
             <Logo size="lg" variant="light" />
-          </a>
+          </button>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-7">
@@ -93,13 +98,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookClick }) => {
               className="text-sm font-semibold text-slate-200 hover:text-blue-400 transition-colors cursor-pointer"
             >
               Service Area
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollToSection('booking')}
-              className="text-sm font-semibold text-slate-200 hover:text-blue-400 transition-colors cursor-pointer"
-            >
-              Contact
             </button>
           </nav>
 
@@ -202,17 +200,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookClick }) => {
               <button
                 type="button"
                 onClick={() => scrollToSection('service-area')}
-                className="w-full flex items-center justify-between py-3 px-2 text-left text-base font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-xl border-b border-slate-900/80 active:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
+                className="w-full flex items-center justify-between py-3 px-2 text-left text-base font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-xl active:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
               >
                 <span>Service Area & Coverage</span>
                 <span className="text-xs text-blue-400 font-medium">20-Mile Radius</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollToSection('booking')}
-                className="w-full flex items-center justify-between py-3 px-2 text-left text-base font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-xl active:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
-              >
-                <span>Contact & Booking</span>
               </button>
 
               <div className="pt-4 flex flex-col gap-2.5">
