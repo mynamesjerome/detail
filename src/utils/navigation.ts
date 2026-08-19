@@ -39,6 +39,14 @@ export function scrollToSection(sectionIdOrPath: string, updateUrl = true, durat
     route = getRouteById(sectionIdOrPath);
   }
 
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent('app-route-change', {
+        detail: { path: route.path, id: route.id, title: route.title }
+      })
+    );
+  }
+
   if (route.id === 'hero' || route.path === '/') {
     if (updateUrl && window.location.pathname !== '/') {
       window.history.pushState({ section: 'hero' }, '', '/');
