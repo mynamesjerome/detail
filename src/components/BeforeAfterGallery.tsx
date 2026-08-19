@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   X,
   Maximize2,
-  ShieldCheck,
   Camera,
   Play,
   Pause,
@@ -16,8 +15,7 @@ import {
   Film,
   RotateCw,
   ChevronLeft,
-  ChevronRight,
-  ImageIcon
+  ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -315,9 +313,18 @@ export const BeforeAfterGallery: React.FC = () => {
 
   useEffect(() => {
     resetZoomAndPan();
-    setIsPlaying(false);
+    if (activeMediaItem?.type === 'video') {
+      setIsPlaying(true);
+      setShowVideoControls(true);
+      if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+      controlsTimeoutRef.current = setTimeout(() => {
+        setShowVideoControls(false);
+      }, 3000);
+    } else {
+      setIsPlaying(false);
+    }
     setCurrentTime(0);
-  }, [selectedGroup, activeMediaIndex, resetZoomAndPan]);
+  }, [selectedGroup, activeMediaIndex, resetZoomAndPan, activeMediaItem?.type]);
 
   // Fullscreen change listener
   useEffect(() => {
@@ -462,25 +469,6 @@ export const BeforeAfterGallery: React.FC = () => {
     if (e) e.stopPropagation();
     if (!selectedGroup) return;
     setActiveMediaIndex((prev) => (prev < selectedGroup.items.length - 1 ? prev + 1 : 0));
-  };
-
-  // Flip on card directly
-  const handleCardPrev = (e: React.MouseEvent, group: VehicleGroup) => {
-    e.stopPropagation();
-    setCardActiveIndices((prev) => {
-      const current = prev[group.id] || 0;
-      const next = current > 0 ? current - 1 : group.items.length - 1;
-      return { ...prev, [group.id]: next };
-    });
-  };
-
-  const handleCardNext = (e: React.MouseEvent, group: VehicleGroup) => {
-    e.stopPropagation();
-    setCardActiveIndices((prev) => {
-      const current = prev[group.id] || 0;
-      const next = current < group.items.length - 1 ? current + 1 : 0;
-      return { ...prev, [group.id]: next };
-    });
   };
 
   // Keyboard controls for modal
@@ -632,7 +620,6 @@ export const BeforeAfterGallery: React.FC = () => {
             const activeIdx = cardActiveIndices[group.id] || 0;
             const currentItem = group.items[activeIdx] || group.items[0];
             const isVideo = currentItem.type === 'video';
-            const hasMultiple = group.items.length > 1;
             const safeMediaUrl = encodeURI(currentItem.url);
 
             return (
@@ -664,7 +651,7 @@ export const BeforeAfterGallery: React.FC = () => {
                 <div className={`relative w-full ${group.aspectRatio} rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950 flex items-center justify-center`}>
                   {isVideo ? (
                     <video
-                      src={safeMediaUrl}
+                      src={`${safeMediaUrl}#t=0.001`}
                       preload="metadata"
                       muted
                       playsInline
@@ -691,41 +678,12 @@ export const BeforeAfterGallery: React.FC = () => {
                   {/* Top Gloss Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/20 pointer-events-none" />
 
-                  {/* Video Badge & Play Button */}
+                  {/* Video Play Button */}
                   {isVideo && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-blue-600/90 text-white flex items-center justify-center shadow-2xl border border-blue-400/50 backdrop-blur-sm group-hover/card:scale-110 transition-transform">
                         <Play className="w-6 h-6 fill-white ml-0.5" />
                       </div>
-                      <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-slate-950/80 text-[10px] font-bold text-blue-300 border border-slate-700 backdrop-blur-sm flex items-center gap-1">
-                        <Film className="w-3 h-3 text-blue-400" />
-                        <span>VIDEO</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Multi-Photo / Multi-Angle Flipping Badge on Card */}
-                  {hasMultiple && (
-                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-slate-950/85 backdrop-blur-md px-2 py-1 rounded-full border border-slate-700/80 z-10 shadow-lg">
-                      <button
-                        type="button"
-                        onClick={(e) => handleCardPrev(e, group)}
-                        className="p-0.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-full transition-colors"
-                        title="Previous angle"
-                      >
-                        <ChevronLeft className="w-3.5 h-3.5" />
-                      </button>
-                      <span className="text-[10px] font-mono font-bold text-blue-400 px-1">
-                        {currentItem.label ? currentItem.label : `${activeIdx + 1} / ${group.items.length}`}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={(e) => handleCardNext(e, group)}
-                        className="p-0.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-full transition-colors"
-                        title="Next angle"
-                      >
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
                     </div>
                   )}
 
@@ -745,38 +703,26 @@ export const BeforeAfterGallery: React.FC = () => {
       {/* Lightbox / Video Interactive Player Modal */}
       <AnimatePresence>
         {selectedGroup && activeMediaItem && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-hidden">
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedGroup(null)}
-              className="fixed inset-0 bg-slate-950/95 backdrop-blur-lg"
+              className="fixed inset-0 bg-slate-950/90 backdrop-blur-md"
             />
 
             {/* Modal Container */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 15 }}
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94, y: 15 }}
-              className="relative w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden z-10 my-auto flex flex-col"
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="relative w-[96vw] max-w-6xl xl:max-w-7xl h-[88vh] sm:h-[92vh] max-h-[920px] bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden z-10 my-auto flex flex-col"
             >
               {/* Modal Top Control Bar */}
-              <div className="p-3.5 sm:p-4 flex items-center justify-between border-b border-slate-800 bg-slate-950/90 gap-2">
+              <div className="p-3 sm:p-3.5 flex items-center justify-between border-b border-slate-800 bg-slate-950/90 gap-2 shrink-0">
                 <div className="flex items-center gap-2 overflow-hidden">
-                  {activeMediaItem.type === 'video' ? (
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/90 text-blue-300 border border-blue-800 text-xs font-bold shrink-0">
-                      <Film className="w-3.5 h-3.5 text-blue-400" />
-                      <span>HD Video Showcase</span>
-                    </div>
-                  ) : (
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/80 text-blue-300 border border-blue-800/80 text-xs font-bold shrink-0">
-                      <ImageIcon className="w-3.5 h-3.5 text-blue-400" />
-                      <span>Full Resolution Inspection</span>
-                    </div>
-                  )}
-
                   {/* Multi-angle switcher tabs in header */}
                   {selectedGroup.items.length > 1 && (
                     <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-full border border-slate-800 shrink-0">
@@ -788,13 +734,13 @@ export const BeforeAfterGallery: React.FC = () => {
                             setActiveMediaIndex(idx);
                             resetZoomAndPan();
                           }}
-                          className={`px-3 py-0.5 rounded-full text-xs font-bold transition-all flex items-center gap-1 ${
+                          className={`px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
                             activeMediaIndex === idx
                               ? 'bg-blue-600 text-white shadow-md'
                               : 'text-slate-400 hover:text-white'
                           }`}
                         >
-                          {item.type === 'video' ? <Film className="w-3 h-3" /> : <Camera className="w-3 h-3" />}
+                          {item.type === 'video' ? <Film className="w-3.5 h-3.5" /> : <Camera className="w-3.5 h-3.5" />}
                           <span>{item.label || `${idx + 1}`}</span>
                         </button>
                       ))}
@@ -845,7 +791,7 @@ export const BeforeAfterGallery: React.FC = () => {
 
                   <button
                     onClick={() => setSelectedGroup(null)}
-                    className="p-1.5 sm:p-2 rounded-full bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition-colors"
+                    className="p-1.5 sm:p-2 rounded-full bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition-colors cursor-pointer"
                     aria-label="Close modal"
                   >
                     <X className="w-5 h-5" />
@@ -853,21 +799,23 @@ export const BeforeAfterGallery: React.FC = () => {
                 </div>
               </div>
 
-              {/* MEDIA STAGE */}
-              <div className="relative w-full">
+              {/* MEDIA STAGE (Fills remaining height) */}
+              <div className="relative w-full flex-1 min-h-0 bg-slate-950 select-none overflow-hidden flex items-center justify-center">
                 {activeMediaItem.type === 'video' ? (
                   /* VIDEO PLAYER CONTAINER */
                   <div
                     ref={videoWrapperRef}
                     onMouseMove={handleVideoMouseMove}
-                    className="relative w-full h-80 sm:h-[460px] md:h-[500px] bg-black select-none overflow-hidden flex items-center justify-center group"
+                    className="relative w-full h-full bg-black select-none overflow-hidden flex items-center justify-center group"
                   >
                     <video
                       key={activeMediaItem.url}
                       ref={videoRef}
-                      src={encodeURI(activeMediaItem.url)}
-                      className="w-full h-full object-contain"
+                      src={`${encodeURI(activeMediaItem.url)}#t=0.001`}
+                      preload="metadata"
+                      className="w-full h-full max-w-full max-h-full object-contain"
                       playsInline
+                      autoPlay
                       loop
                       onClick={togglePlay}
                       onTimeUpdate={() => {
@@ -902,7 +850,7 @@ export const BeforeAfterGallery: React.FC = () => {
 
                     {/* Custom Bottom Video Control Bar */}
                     <div
-                      className={`absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent p-3 sm:p-4 transition-opacity duration-300 flex flex-col gap-2 ${
+                      className={`absolute bottom-3 sm:bottom-4 inset-x-3 sm:inset-x-6 max-w-3xl mx-auto bg-slate-950/90 backdrop-blur-md rounded-2xl border border-slate-800 p-3 sm:p-3.5 transition-opacity duration-300 flex flex-col gap-2 z-30 ${
                         showVideoControls || !isPlaying ? 'opacity-100' : 'opacity-0 pointer-events-none'
                       }`}
                     >
@@ -922,11 +870,11 @@ export const BeforeAfterGallery: React.FC = () => {
                       {/* Controls Row */}
                       <div className="flex items-center justify-between gap-2 text-white">
                         {/* Left: Play/Pause, Rewind, Time, Volume */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2.5 sm:gap-3">
                           <button
                             type="button"
                             onClick={togglePlay}
-                            className="p-1.5 text-white hover:text-blue-400 transition-colors"
+                            className="p-1.5 text-white hover:text-blue-400 transition-colors cursor-pointer"
                             title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
                           >
                             {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
@@ -937,7 +885,7 @@ export const BeforeAfterGallery: React.FC = () => {
                             onClick={() => {
                               if (videoRef.current) videoRef.current.currentTime = Math.max(videoRef.current.currentTime - 5, 0);
                             }}
-                            className="p-1 text-slate-400 hover:text-white transition-colors text-xs flex items-center gap-0.5"
+                            className="hidden sm:flex p-1 text-slate-400 hover:text-white transition-colors text-xs items-center gap-0.5 cursor-pointer"
                             title="Rewind 5s (Left Arrow)"
                           >
                             <RotateCcw className="w-4 h-4" />
@@ -949,7 +897,7 @@ export const BeforeAfterGallery: React.FC = () => {
                             onClick={() => {
                               if (videoRef.current) videoRef.current.currentTime = Math.min(videoRef.current.currentTime + 5, duration);
                             }}
-                            className="p-1 text-slate-400 hover:text-white transition-colors text-xs flex items-center gap-0.5"
+                            className="hidden sm:flex p-1 text-slate-400 hover:text-white transition-colors text-xs items-center gap-0.5 cursor-pointer"
                             title="Forward 5s (Right Arrow)"
                           >
                             <RotateCw className="w-4 h-4" />
@@ -966,7 +914,7 @@ export const BeforeAfterGallery: React.FC = () => {
                             <button
                               type="button"
                               onClick={toggleMute}
-                              className="p-1 text-slate-300 hover:text-white transition-colors"
+                              className="p-1 text-slate-300 hover:text-white transition-colors cursor-pointer"
                               title={isMuted ? 'Unmute (m)' : 'Mute (m)'}
                             >
                               {isMuted || volume === 0 ? (
@@ -989,24 +937,24 @@ export const BeforeAfterGallery: React.FC = () => {
 
                         {/* Right: Speed & Fullscreen */}
                         <div className="flex items-center gap-2">
-                          {/* Playback speed selector with slow-mo options */}
+                          {/* Playback speed selector */}
                           <div className="flex items-center bg-slate-900/90 rounded-full p-0.5 border border-slate-700 text-xs">
                             <span className="text-[9px] uppercase tracking-wider font-extrabold text-blue-400 px-1.5 hidden md:inline">
                               Speed
                             </span>
-                            {[0.25, 0.5, 0.75, 1, 1.5, 2].map((spd) => (
+                            {[0.5, 1, 1.5, 2].map((spd) => (
                               <button
                                 key={spd}
                                 type="button"
                                 onClick={() => handleSpeedChange(spd)}
-                                className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold transition-all ${
+                                className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer ${
                                   playbackSpeed === spd
                                     ? 'bg-blue-600 text-white shadow-sm'
                                     : 'text-slate-400 hover:text-white'
                                 }`}
-                                title={spd < 1 ? `Slow Motion (${spd}x)` : `${spd}x speed`}
+                                title={`${spd}x speed`}
                               >
-                                {spd < 1 ? `${spd}x` : `${spd}x`}
+                                {spd}x
                               </button>
                             ))}
                           </div>
@@ -1014,7 +962,7 @@ export const BeforeAfterGallery: React.FC = () => {
                           <button
                             type="button"
                             onClick={toggleFullscreen}
-                            className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-full transition-colors"
+                            className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-full transition-colors cursor-pointer"
                             title="Toggle Fullscreen (f)"
                           >
                             {isVideoFullscreen ? (
@@ -1028,14 +976,14 @@ export const BeforeAfterGallery: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  /* PHOTO STAGE WITH INTERACTIVE ZOOM & PAN */
+                  /* PHOTO STAGE WITH EXPANSIVE VIEW & INTERACTIVE ZOOM */
                   <div
                     ref={imageContainerRef}
                     onDoubleClick={handleDoubleClick}
                     onPointerDown={handlePanPointerDown}
                     onPointerMove={handlePanPointerMove}
                     onPointerUp={handlePanPointerUp}
-                    className={`relative h-80 sm:h-[460px] md:h-[500px] w-full bg-slate-950 select-none overflow-hidden flex items-center justify-center ${
+                    className={`relative w-full h-full bg-slate-950 select-none overflow-hidden flex items-center justify-center p-2 sm:p-4 ${
                       zoomLevel > 1 ? (isPanning ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in'
                     }`}
                   >
@@ -1060,7 +1008,7 @@ export const BeforeAfterGallery: React.FC = () => {
                           }
                         }}
                         draggable={false}
-                        className="max-w-full max-h-full object-contain rounded-xl select-none pointer-events-none"
+                        className="max-w-full max-h-full w-auto h-auto object-contain rounded-xl select-none pointer-events-none"
                       />
                     </div>
 
@@ -1081,30 +1029,26 @@ export const BeforeAfterGallery: React.FC = () => {
                     <button
                       type="button"
                       onClick={handlePrevMedia}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 text-white flex items-center justify-center shadow-2xl border border-slate-700/80 backdrop-blur-md hover:bg-blue-600 transition-colors z-20"
+                      className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-950/85 text-white flex items-center justify-center shadow-2xl border border-slate-700/80 backdrop-blur-md hover:bg-blue-600 transition-all z-20 cursor-pointer"
                       title="Previous angle (Left Arrow)"
                     >
-                      <ChevronLeft className="w-5 h-5" />
+                      <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                     </button>
 
                     <button
                       type="button"
                       onClick={handleNextMedia}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 text-white flex items-center justify-center shadow-2xl border border-slate-700/80 backdrop-blur-md hover:bg-blue-600 transition-colors z-20"
+                      className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-950/85 text-white flex items-center justify-center shadow-2xl border border-slate-700/80 backdrop-blur-md hover:bg-blue-600 transition-all z-20 cursor-pointer"
                       title="Next angle (Right Arrow)"
                     >
-                      <ChevronRight className="w-5 h-5" />
+                      <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
                     </button>
                   </>
                 )}
               </div>
 
               {/* Modal Footer CTA */}
-              <div className="p-3.5 sm:p-4 bg-slate-900 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <span className="text-xs text-slate-400 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  <span>100% Mobile On-Site Service across Austin, TX</span>
-                </span>
+              <div className="p-3 sm:p-3.5 bg-slate-950/90 border-t border-slate-800 flex items-center justify-end shrink-0">
                 <a
                   href="#booking"
                   onClick={() => setSelectedGroup(null)}
