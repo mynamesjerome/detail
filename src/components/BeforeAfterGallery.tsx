@@ -351,9 +351,33 @@ export const BeforeAfterGallery: React.FC = () => {
     if (videoRef.current.paused) {
       videoRef.current.play().catch(() => {});
       setIsPlaying(true);
+      setShowVideoControls(true);
+      if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+      controlsTimeoutRef.current = setTimeout(() => {
+        setShowVideoControls(false);
+      }, 1000);
     } else {
       videoRef.current.pause();
       setIsPlaying(false);
+      setShowVideoControls(true);
+      if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+    }
+  };
+
+  const handleVideoTapOrClick = () => {
+    if (isPlaying) {
+      setShowVideoControls((prev) => {
+        const next = !prev;
+        if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+        if (next) {
+          controlsTimeoutRef.current = setTimeout(() => {
+            setShowVideoControls(false);
+          }, 1000);
+        }
+        return next;
+      });
+    } else {
+      togglePlay();
     }
   };
 
@@ -383,13 +407,16 @@ export const BeforeAfterGallery: React.FC = () => {
 
   const toggleFullscreen = () => {
     if (!videoWrapperRef.current) return;
+    const video = videoRef.current as any;
     if (!document.fullscreenElement) {
       if (videoWrapperRef.current.requestFullscreen) {
-        videoWrapperRef.current.requestFullscreen();
+        videoWrapperRef.current.requestFullscreen().catch(() => {});
+      } else if (video && video.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen();
       }
     } else {
       if (document.exitFullscreen) {
-        document.exitFullscreen();
+        document.exitFullscreen().catch(() => {});
       }
     }
   };
@@ -407,7 +434,7 @@ export const BeforeAfterGallery: React.FC = () => {
     if (isPlaying) {
       controlsTimeoutRef.current = setTimeout(() => {
         setShowVideoControls(false);
-      }, 2500);
+      }, 1000);
     }
   };
 
@@ -805,8 +832,9 @@ export const BeforeAfterGallery: React.FC = () => {
                   /* VIDEO PLAYER CONTAINER */
                   <div
                     ref={videoWrapperRef}
+                    onClick={handleVideoTapOrClick}
                     onMouseMove={handleVideoMouseMove}
-                    className="relative w-full h-full bg-black select-none overflow-hidden flex items-center justify-center group"
+                    className="relative w-full h-full bg-black select-none overflow-hidden flex items-center justify-center cursor-pointer group"
                   >
                     <video
                       key={activeMediaItem.url}
@@ -817,7 +845,10 @@ export const BeforeAfterGallery: React.FC = () => {
                       playsInline
                       autoPlay
                       loop
-                      onClick={togglePlay}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleVideoTapOrClick();
+                      }}
                       onTimeUpdate={() => {
                         if (videoRef.current) {
                           setCurrentTime(videoRef.current.currentTime);
@@ -831,25 +862,24 @@ export const BeforeAfterGallery: React.FC = () => {
                       onEnded={() => setIsPlaying(false)}
                     />
 
-                    {/* Big Centered Play/Pause Click Overlay */}
-                    {(!isPlaying || showVideoControls) && (
+                    {/* Big Centered Play Button (Visible When Paused) */}
+                    {!isPlaying && (
                       <button
                         type="button"
-                        onClick={togglePlay}
-                        className={`absolute w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-slate-950/80 text-white flex items-center justify-center shadow-2xl border border-white/20 backdrop-blur-md transition-all transform hover:scale-110 active:scale-95 ${
-                          !isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-80'
-                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          togglePlay();
+                        }}
+                        className="absolute w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-slate-950/85 text-white flex items-center justify-center shadow-2xl border border-white/20 backdrop-blur-md transition-all transform hover:scale-110 active:scale-95 z-20"
+                        title="Play"
                       >
-                        {isPlaying ? (
-                          <Pause className="w-8 h-8 fill-white" />
-                        ) : (
-                          <Play className="w-8 h-8 fill-white ml-1" />
-                        )}
+                        <Play className="w-8 h-8 fill-white ml-1" />
                       </button>
                     )}
 
                     {/* Custom Bottom Video Control Bar */}
                     <div
+                      onClick={(e) => e.stopPropagation()}
                       className={`absolute bottom-3 sm:bottom-4 inset-x-3 sm:inset-x-6 max-w-3xl mx-auto bg-slate-950/90 backdrop-blur-md rounded-2xl border border-slate-800 p-3 sm:p-3.5 transition-opacity duration-300 flex flex-col gap-2 z-30 ${
                         showVideoControls || !isPlaying ? 'opacity-100' : 'opacity-0 pointer-events-none'
                       }`}
@@ -962,7 +992,7 @@ export const BeforeAfterGallery: React.FC = () => {
                           <button
                             type="button"
                             onClick={toggleFullscreen}
-                            className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-full transition-colors cursor-pointer"
+                            className="hidden sm:inline-flex p-1.5 text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-full transition-colors cursor-pointer"
                             title="Toggle Fullscreen (f)"
                           >
                             {isVideoFullscreen ? (
