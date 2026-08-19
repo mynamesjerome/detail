@@ -134,16 +134,28 @@ export const ReviewsMarquee: React.FC = () => {
             </p>
           </div>
 
-          {/* Top Right Direct Button */}
-          <a
-            href="https://share.google/ZfnGtW2sYFWglAEk6"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer group shrink-0"
-          >
-            <span>Read All Reviews on Google</span>
-            <ExternalLink className="w-4 h-4 text-blue-600 group-hover:translate-x-0.5 transition-transform" />
-          </a>
+          {/* Top Right Actions */}
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <a
+              href="https://g.page/r/CbAvVh2r1ukiEAI/review"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-900/30 transition-all cursor-pointer group shrink-0"
+            >
+              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              <span>Leave a Google Review</span>
+              <ExternalLink className="w-3.5 h-3.5 text-blue-200 group-hover:translate-x-0.5 transition-transform" />
+            </a>
+            <a
+              href="https://g.page/r/CbAvVh2r1ukiEAI/review"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-semibold text-xs sm:text-sm transition-all cursor-pointer group shrink-0"
+            >
+              <span>Read on Google</span>
+              <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+            </a>
+          </div>
         </motion.div>
       </div>
 
@@ -234,7 +246,7 @@ export const ReviewsMarquee: React.FC = () => {
             <div className="flex items-center justify-between pt-4 border-t border-slate-800">
               <span className="text-xs text-slate-400">Google Review for Gavin's Mobile Car Detailing</span>
               <a
-                href="https://share.google/ZfnGtW2sYFWglAEk6"
+                href="https://g.page/r/CbAvVh2r1ukiEAI/review"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1"
