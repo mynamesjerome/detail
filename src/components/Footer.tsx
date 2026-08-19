@@ -177,7 +177,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectLocation, onSelectServic
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-normal">
-          <p>© {new Date().getFullYear()} Gavin's Car Detailing. All rights reserved. Austin, Texas.</p>
+          <p>© {new Date().getFullYear()} Gavin's Mobile Car Detailing. All rights reserved. Austin, Texas.</p>
 
           {/* Back to Top Button */}
           <button

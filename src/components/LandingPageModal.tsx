@@ -141,7 +141,7 @@ export const LandingPageModal: React.FC<LandingPageModalProps> = ({
                 <div className="space-y-3">
                   <h3 className="text-base font-bold text-white flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-blue-400" />
-                    <span>Why {locationData.name} Residents Choose Gavin's Detailing</span>
+                    <span>Why {locationData.name} Residents Choose Gavin's Mobile Detailing</span>
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {locationData.localHighlights.map((hl, idx) => (

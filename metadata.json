@@ -1,6 +1,6 @@
 {
-  "name": "Gavin's Car Detailing",
-  "description": "Premium mobile auto detailing service in Austin, Texas. Showroom perfection delivered to your doorstep.",
+  "name": "Gavin's Mobile Car Detailing",
+  "description": "Gavin's Mobile Car Detailing provides premier mobile auto detailing in Austin, TX. Showroom perfection delivered to your doorstep.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

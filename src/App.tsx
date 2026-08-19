@@ -35,7 +35,7 @@ export default function App() {
       if (LOCATION_LANDING_PAGES[slug]) {
         setActiveLocationSlug(slug);
         setActiveServiceSlug(null);
-        document.title = `${LOCATION_LANDING_PAGES[slug].headline} | Gavin's Car Detailing`;
+        document.title = `${LOCATION_LANDING_PAGES[slug].headline} | Gavin's Mobile Car Detailing`;
         return true;
       }
     } else if (path.startsWith('/services/')) {
@@ -43,7 +43,7 @@ export default function App() {
       if (SERVICE_LANDING_PAGES[slug]) {
         setActiveServiceSlug(slug);
         setActiveLocationSlug(null);
-        document.title = `${SERVICE_LANDING_PAGES[slug].headline} | Gavin's Car Detailing`;
+        document.title = `${SERVICE_LANDING_PAGES[slug].headline} | Gavin's Mobile Car Detailing`;
         return true;
       }
     }
@@ -58,7 +58,7 @@ export default function App() {
       if (!isLanding) {
         setActiveLocationSlug(null);
         setActiveServiceSlug(null);
-        document.title = "Gavin's Car Detailing | Premier Mobile Detailing in Austin, TX";
+        document.title = "Gavin's Mobile Car Detailing | Premier Mobile Detailing Austin, TX";
         const route = getRouteByPath(path);
         if (route.id !== 'hero') {
           scrollToSection(route.id, false, 500);
@@ -96,7 +96,7 @@ export default function App() {
       setActiveLocationSlug(slug);
       setActiveServiceSlug(null);
       window.history.pushState(null, '', `/locations/${slug}`);
-      document.title = `${LOCATION_LANDING_PAGES[slug].headline} | Gavin's Car Detailing`;
+      document.title = `${LOCATION_LANDING_PAGES[slug].headline} | Gavin's Mobile Car Detailing`;
     }
   };
 
@@ -105,7 +105,7 @@ export default function App() {
       setActiveServiceSlug(slug);
       setActiveLocationSlug(null);
       window.history.pushState(null, '', `/services/${slug}`);
-      document.title = `${SERVICE_LANDING_PAGES[slug].headline} | Gavin's Car Detailing`;
+      document.title = `${SERVICE_LANDING_PAGES[slug].headline} | Gavin's Mobile Car Detailing`;
     }
   };
 
@@ -113,7 +113,7 @@ export default function App() {
     setActiveLocationSlug(null);
     setActiveServiceSlug(null);
     window.history.pushState(null, '', '/');
-    document.title = "Gavin's Car Detailing | Premier Mobile Detailing in Austin, TX";
+    document.title = "Gavin's Mobile Car Detailing | Premier Mobile Detailing Austin, TX";
   };
 
   const handleSelectPackage = (packageId: string) => {

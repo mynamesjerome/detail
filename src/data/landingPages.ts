@@ -37,7 +37,7 @@ export const LOCATION_LANDING_PAGES: Record<string, LocationLandingData> = {
     zipCodes: ['78746'],
     keyLandmarks: ['Westlake High School area', 'Rollingwood', 'Wild Basin', 'Eanes', 'Westlake Country Club'],
     description:
-      "Gavin's Car Detailing provides luxury mobile auto detailing throughout Westlake Hills and the 78746 corridor. Whether caring for high-end luxury European SUVs, sports cars, or family road-trip vehicles, we deliver high-pressure pH-neutral foam washing, interior steam sanitization, and multi-month ceramic protection right to your home.",
+      "Gavin's Mobile Car Detailing provides luxury mobile auto detailing throughout Westlake Hills and the 78746 corridor. Whether caring for high-end luxury European SUVs, sports cars, or family road-trip vehicles, we deliver high-pressure pH-neutral foam washing, interior steam sanitization, and multi-month ceramic protection right to your home.",
     localHighlights: [
       {
         title: 'HOA & Driveway Friendly',
@@ -61,7 +61,7 @@ export const LOCATION_LANDING_PAGES: Record<string, LocationLandingData> = {
     zipCodes: ['78732'],
     keyLandmarks: ['UT Golf Club', 'Steiner Ranch Lake Club', 'John Simpson Park', 'Bella Mar', 'River Bend', 'Lake Austin'],
     description:
-      "Gavin's Car Detailing delivers showroom-quality mobile auto detailing straight to your driveway in Steiner Ranch. We specialize in removing hill country dust, lakefront humidity residue, and road grime while applying multi-month ceramic paint protection and 220°F interior steam sanitization.",
+      "Gavin's Mobile Car Detailing delivers showroom-quality mobile auto detailing straight to your driveway in Steiner Ranch. We specialize in removing hill country dust, lakefront humidity residue, and road grime while applying multi-month ceramic paint protection and 220°F interior steam sanitization.",
     localHighlights: [
       {
         title: 'Hill Country Sun & UV Defense',
@@ -85,7 +85,7 @@ export const LOCATION_LANDING_PAGES: Record<string, LocationLandingData> = {
     zipCodes: ['78734', '78738'],
     keyLandmarks: ['Lake Travis', 'Lakeway Marina', 'The Hills', 'Flintrock Falls', 'Rough Hollow'],
     description:
-      "Living near Lake Travis means vehicles frequently face lake road dust, boat ramp humidity, and harsh Central Texas sunlight. Gavin brings full-service mobile auto detailing directly to your garage or driveway in Lakeway, Flintrock, and The Hills.",
+      "Living near Lake Travis means vehicles frequently face lake road dust, boat ramp humidity, and harsh Central Texas sunlight. Gavin's Mobile Car Detailing brings full-service mobile auto care directly to your garage or driveway in Lakeway, Flintrock, and The Hills.",
     localHighlights: [
       {
         title: 'Lake Grime & Bug Removal',
@@ -109,7 +109,7 @@ export const LOCATION_LANDING_PAGES: Record<string, LocationLandingData> = {
     zipCodes: ['78738'],
     keyLandmarks: ['Hill Country Galleria', 'Spanish Oaks', 'Falconhead', 'Sweetwater', 'Homestead'],
     description:
-      "Enjoy professional auto detailing without leaving your neighborhood. Gavin's Car Detailing travels directly to your residence in Bee Cave, Spanish Oaks, and Falconhead with premium steam cleaning and hand foam washing.",
+      "Enjoy professional auto detailing without leaving your neighborhood. Gavin's Mobile Car Detailing travels directly to your residence in Bee Cave, Spanish Oaks, and Falconhead with premium steam cleaning and hand foam washing.",
     localHighlights: [
       {
         title: 'Exotic & Luxury Vehicle Care',
@@ -133,7 +133,7 @@ export const LOCATION_LANDING_PAGES: Record<string, LocationLandingData> = {
     zipCodes: ['78735'],
     keyLandmarks: ['Omni Barton Creek Resort', 'Barton Creek Greenbelt', 'Calera', 'Lost Creek', 'The Foothills'],
     description:
-      "From high-performance sports cars to spacious luxury family haulers, Gavin's Car Detailing delivers unmatched mobile precision to Barton Creek homes. We restore interior leather, steam-sanitize AC vents, and seal your paint with hydrophobic gloss.",
+      "From high-performance sports cars to spacious luxury family haulers, Gavin's Mobile Car Detailing delivers unmatched mobile precision to Barton Creek homes. We restore interior leather, steam-sanitize AC vents, and seal your paint with hydrophobic gloss.",
     localHighlights: [
       {
         title: 'Leather Restoration & UV Defense',
@@ -181,7 +181,7 @@ export const LOCATION_LANDING_PAGES: Record<string, LocationLandingData> = {
     zipCodes: ['78703'],
     keyLandmarks: ['Tarrytown Park', 'Lake Austin Blvd', 'Deep Eddy', 'Enfield', 'West Austin Park', 'Pemberton Heights'],
     description:
-      "Tarrytown residents trust Gavin's Car Detailing for meticulous, quiet, and discreet on-site automotive care. We deliver full steam interior restoration and brilliant gloss right in your driveway.",
+      "Tarrytown residents trust Gavin's Mobile Car Detailing for meticulous, quiet, and discreet on-site automotive care. We deliver full steam interior restoration and brilliant gloss right in your driveway.",
     localHighlights: [
       {
         title: 'Compact Driveway Optimized',
@@ -277,7 +277,7 @@ export const LOCATION_LANDING_PAGES: Record<string, LocationLandingData> = {
     zipCodes: ['78613'],
     keyLandmarks: ['HEB Center', 'Brushy Creek', 'Twin Creeks', 'Ranch at Cypress Creek', 'Bell District'],
     description:
-      "Gavin's Car Detailing brings five-star auto detailing straight to Cedar Park driveways. We provide deep interior cleaning, steam sanitization, and high-gloss exterior foam washing.",
+      "Gavin's Mobile Car Detailing brings five-star auto detailing straight to Cedar Park driveways. We provide deep interior cleaning, steam sanitization, and high-gloss exterior foam washing.",
     localHighlights: [
       {
         title: 'Doorstep Convenience',

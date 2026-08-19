@@ -232,7 +232,7 @@ export const ReviewsMarquee: React.FC = () => {
             </p>
 
             <div className="flex items-center justify-between pt-4 border-t border-slate-800">
-              <span className="text-xs text-slate-400">Google Review for Gavin's Car Detailing</span>
+              <span className="text-xs text-slate-400">Google Review for Gavin's Mobile Car Detailing</span>
               <a
                 href="https://share.google/ZfnGtW2sYFWglAEk6"
                 target="_blank"
