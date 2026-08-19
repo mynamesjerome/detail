@@ -115,12 +115,15 @@ export const Footer: React.FC<FooterProps> = ({ onSelectLocation, onSelectServic
             <ul className="space-y-2 text-xs font-medium">
               {[
                 { name: 'Westlake Hills Detailing', slug: 'westlake-hills' },
+                { name: 'Steiner Ranch Mobile Wash', slug: 'steiner-ranch' },
                 { name: 'Lakeway & Lake Travis', slug: 'lakeway' },
-                { name: 'Bee Cave Mobile Detailing', slug: 'bee-cave' },
+                { name: 'Bee Cave & Spanish Oaks', slug: 'bee-cave' },
                 { name: 'Barton Creek Auto Care', slug: 'barton-creek' },
-                { name: 'Tarrytown Mobile Wash', slug: 'tarrytown' },
-                { name: 'Round Rock Detailing', slug: 'round-rock' },
+                { name: 'Davenport Ranch & 360', slug: 'davenport-ranch' },
+                { name: 'Tarrytown & Pemberton', slug: 'tarrytown' },
+                { name: 'Avery Ranch & Great Hills', slug: 'avery-ranch' },
                 { name: 'Circle C Ranch Detailing', slug: 'circle-c' },
+                { name: 'Round Rock Detailing', slug: 'round-rock' },
                 { name: 'Cedar Park Mobile Care', slug: 'cedar-park' },
               ].map((loc) => (
                 <li key={loc.slug}>

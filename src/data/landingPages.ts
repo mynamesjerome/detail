@@ -53,6 +53,30 @@ export const LOCATION_LANDING_PAGES: Record<string, LocationLandingData> = {
       },
     ],
   },
+  'steiner-ranch': {
+    slug: 'steiner-ranch',
+    name: 'Steiner Ranch',
+    subTitle: 'Mobile Auto Detailing in Steiner Ranch, TX',
+    headline: 'Premier Mobile Car Detailing & Ceramic Care in Steiner Ranch & UT Golf Club',
+    zipCodes: ['78732'],
+    keyLandmarks: ['UT Golf Club', 'Steiner Ranch Lake Club', 'John Simpson Park', 'Bella Mar', 'River Bend', 'Lake Austin'],
+    description:
+      "Gavin's Car Detailing delivers showroom-quality mobile auto detailing straight to your driveway in Steiner Ranch. We specialize in removing hill country dust, lakefront humidity residue, and road grime while applying multi-month ceramic paint protection and 220°F interior steam sanitization.",
+    localHighlights: [
+      {
+        title: 'Hill Country Sun & UV Defense',
+        description: 'High-grade ceramic sealants shield clear coats against relentless Hill Country UV rays and intense summer heat.',
+      },
+      {
+        title: 'Lake & Golf Dust Removal',
+        description: 'Chemical iron fallout and pH-neutral snow foam wash eliminate stubborn trail dirt and golf course grime without swirling paint.',
+      },
+      {
+        title: 'Doorstep Convenience',
+        description: 'We bring professional mobile detailing equipment right to your Steiner Ranch home, leaving your vehicles pristine.',
+      },
+    ],
+  },
   'lakeway': {
     slug: 'lakeway',
     name: 'Lakeway & Lake Travis',
@@ -79,11 +103,11 @@ export const LOCATION_LANDING_PAGES: Record<string, LocationLandingData> = {
   },
   'bee-cave': {
     slug: 'bee-cave',
-    name: 'Bee Cave',
-    subTitle: 'Mobile Auto Detailing in Bee Cave, TX',
-    headline: 'Precision Mobile Auto Care in Bee Cave & Hill Country Galleria',
+    name: 'Bee Cave & Spanish Oaks',
+    subTitle: 'Mobile Auto Detailing in Bee Cave & Spanish Oaks, TX',
+    headline: 'Precision Mobile Auto Care in Bee Cave, Spanish Oaks & Galleria',
     zipCodes: ['78738'],
-    keyLandmarks: ['Hill Country Galleria', 'Spanish Oaks', 'Falconhead', 'Sweetwater'],
+    keyLandmarks: ['Hill Country Galleria', 'Spanish Oaks', 'Falconhead', 'Sweetwater', 'Homestead'],
     description:
       "Enjoy professional auto detailing without leaving your neighborhood. Gavin's Car Detailing travels directly to your residence in Bee Cave, Spanish Oaks, and Falconhead with premium steam cleaning and hand foam washing.",
     localHighlights: [
@@ -104,10 +128,10 @@ export const LOCATION_LANDING_PAGES: Record<string, LocationLandingData> = {
   'barton-creek': {
     slug: 'barton-creek',
     name: 'Barton Creek',
-    subTitle: 'Luxury Mobile Detailing in Barton Creek, TX',
+    subTitle: 'Luxury Mobile Detailing in Barton Creek & Lost Creek, TX',
     headline: 'White-Glove Mobile Detailing in Barton Creek & Southwest Austin',
     zipCodes: ['78735'],
-    keyLandmarks: ['Omni Barton Creek Resort', 'Barton Creek Greenbelt', 'Calera', 'Lost Creek'],
+    keyLandmarks: ['Omni Barton Creek Resort', 'Barton Creek Greenbelt', 'Calera', 'Lost Creek', 'The Foothills'],
     description:
       "From high-performance sports cars to spacious luxury family haulers, Gavin's Car Detailing delivers unmatched mobile precision to Barton Creek homes. We restore interior leather, steam-sanitize AC vents, and seal your paint with hydrophobic gloss.",
     localHighlights: [
@@ -125,37 +149,37 @@ export const LOCATION_LANDING_PAGES: Record<string, LocationLandingData> = {
       },
     ],
   },
-  'round-rock': {
-    slug: 'round-rock',
-    name: 'Round Rock',
-    subTitle: 'Mobile Auto Detailing in Round Rock, TX',
-    headline: 'Top-Rated Mobile Car Detailing & Interior Steam Cleaning in Round Rock',
-    zipCodes: ['78664', '78665', '78681'],
-    keyLandmarks: ['Dell Diamond', 'Old Settlers Park', 'Teravista', 'Forest Creek', 'Downtown Round Rock'],
+  'davenport-ranch': {
+    slug: 'davenport-ranch',
+    name: 'Davenport Ranch & Rob Roy',
+    subTitle: 'Mobile Detailing in Davenport Ranch & Loop 360 Corridor',
+    headline: 'Luxury Mobile Auto Detailing in Davenport Ranch, Rob Roy & Seven Oaks',
+    zipCodes: ['78746', '78730'],
+    keyLandmarks: ['Austin Country Club', 'Pennybacker 360 Bridge', 'Rob Roy', 'Seven Oaks', 'St. Stephen’s', 'River Place'],
     description:
-      "Serving families, daily commuters, and car enthusiasts across Round Rock. We come right to your driveway with our full mobile setup to wash, vacuum, shampoo, and ceramic-seal your vehicle.",
+      "Delivering white-glove mobile automotive detailing to executive residences across Davenport Ranch, Rob Roy, and Seven Oaks along the Loop 360 corridor. We specialize in luxury European marques, sports cars, and premium daily drivers.",
     localHighlights: [
       {
-        title: 'Family & Pet-Friendly Stain Removal',
-        description: 'High-temperature steam extraction breaks down juice spills, food stains, and deep pet odor without harsh smells.',
+        title: 'Boutique Exotic & Luxury Care',
+        description: 'Gentle hand detailing for Porsche, Mercedes-Benz, BMW, Audi, Land Rover, and Tesla vehicles.',
       },
       {
-        title: 'Commuter Road Grime Cleanup',
-        description: 'Safely removes I-35 asphalt tar, industrial fallout, and road film from your clear coat and wheels.',
+        title: 'Paint Gloss & Hydrophobic Seal',
+        description: 'SiO2 ceramic infusion creating slick, wet-look gloss while shielding paint against tree sap and hard water.',
       },
       {
-        title: 'Affordable Pricing & Packages',
-        description: 'Clear, transparent pricing from $60 exterior washes to complete $170 deluxe interior/exterior packages.',
+        title: 'Convenient Home Driveway Service',
+        description: 'Direct mobile detailing at your residence with minimal noise, clean setups, and zero travel surcharges.',
       },
     ],
   },
   'tarrytown': {
     slug: 'tarrytown',
-    name: 'Tarrytown & Central Austin',
+    name: 'Tarrytown & Pemberton',
     subTitle: 'Mobile Detailing in Tarrytown & Central Austin, TX',
-    headline: 'Boutique Mobile Auto Detailing in Tarrytown, Austin TX',
+    headline: 'Boutique Mobile Auto Detailing in Tarrytown & Pemberton Heights',
     zipCodes: ['78703'],
-    keyLandmarks: ['Tarrytown Park', 'Lake Austin Blvd', 'Deep Eddy', 'Enfield', 'West Austin Park'],
+    keyLandmarks: ['Tarrytown Park', 'Lake Austin Blvd', 'Deep Eddy', 'Enfield', 'West Austin Park', 'Pemberton Heights'],
     description:
       "Tarrytown residents trust Gavin's Car Detailing for meticulous, quiet, and discreet on-site automotive care. We deliver full steam interior restoration and brilliant gloss right in your driveway.",
     localHighlights: [
@@ -173,13 +197,61 @@ export const LOCATION_LANDING_PAGES: Record<string, LocationLandingData> = {
       },
     ],
   },
+  'avery-ranch': {
+    slug: 'avery-ranch',
+    name: 'Avery Ranch & Great Hills',
+    subTitle: 'Mobile Detailing in Avery Ranch & NW Austin',
+    headline: 'Premier Mobile Detailing in Avery Ranch, Great Hills & Arboretum',
+    zipCodes: ['78717', '78759', '78729'],
+    keyLandmarks: ['Avery Ranch Golf Club', 'The Arboretum', 'Great Hills Park', 'Lakeline', 'Domain area'],
+    description:
+      "Professional doorstep auto detailing for Avery Ranch and North Austin homeowners. Full interior shampooing, steam sterilization, and deep-gloss ceramic washes without the hassle of drop-offs.",
+    localHighlights: [
+      {
+        title: 'Base Hub Advantage',
+        description: 'Direct proximity to our 78759 operational hub means fast scheduling and flexible arrival windows.',
+      },
+      {
+        title: 'Family & Commuter Resets',
+        description: 'Deep carpet wet extraction, kid mess cleanup, and full cabin steam sterilization.',
+      },
+      {
+        title: 'High-Gloss Hand Foam Washes',
+        description: 'Scratch-free hand wash, wheel de-greasing, tire shine, and ceramic spray finish.',
+      },
+    ],
+  },
+  'round-rock': {
+    slug: 'round-rock',
+    name: 'Round Rock',
+    subTitle: 'Mobile Auto Detailing in Round Rock, TX',
+    headline: 'Top-Rated Mobile Car Detailing & Interior Steam Cleaning in Round Rock',
+    zipCodes: ['78664', '78665', '78681'],
+    keyLandmarks: ['Dell Diamond', 'Old Settlers Park', 'Teravista', 'Forest Creek', 'Downtown Round Rock', 'Mayfield Ranch'],
+    description:
+      "Serving families, daily commuters, and car enthusiasts across Round Rock. We come right to your driveway with our full mobile setup to wash, vacuum, shampoo, and ceramic-seal your vehicle.",
+    localHighlights: [
+      {
+        title: 'Family & Pet-Friendly Stain Removal',
+        description: 'High-temperature steam extraction breaks down juice spills, food stains, and deep pet odor without harsh smells.',
+      },
+      {
+        title: 'Commuter Road Grime Cleanup',
+        description: 'Safely removes I-35 asphalt tar, industrial fallout, and road film from your clear coat and wheels.',
+      },
+      {
+        title: 'Affordable Pricing & Packages',
+        description: 'Clear, transparent pricing from $60 exterior washes to complete $170 deluxe interior/exterior packages.',
+      },
+    ],
+  },
   'circle-c': {
     slug: 'circle-c',
     name: 'Circle C Ranch',
     subTitle: 'Mobile Auto Detailing in Circle C Ranch & South Austin',
     headline: 'Circle C Mobile Car Wash, Steam Sanitation & Ceramic Detail',
     zipCodes: ['78739', '78749'],
-    keyLandmarks: ['Circle C Ranch Metro Park', 'Slaughter Creek', 'Grey Rock Golf Club', 'Escarpment Village'],
+    keyLandmarks: ['Circle C Ranch Metro Park', 'Slaughter Creek', 'Grey Rock Golf Club', 'Escarpment Village', 'Belterra'],
     description:
       "Reliable, high-quality mobile car detailing in South Austin and Circle C Ranch. We handle everything on-site while you relax at home or work from your home office.",
     localHighlights: [

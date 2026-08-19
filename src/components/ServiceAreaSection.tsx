@@ -112,12 +112,15 @@ export const ServiceAreaSection: React.FC<ServiceAreaSectionProps> = ({
           <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
             {[
               { name: 'Westlake Hills', slug: 'westlake-hills' },
+              { name: 'Steiner Ranch', slug: 'steiner-ranch' },
               { name: 'Lakeway', slug: 'lakeway' },
               { name: 'Bee Cave', slug: 'bee-cave' },
               { name: 'Barton Creek', slug: 'barton-creek' },
+              { name: 'Davenport Ranch', slug: 'davenport-ranch' },
               { name: 'Tarrytown', slug: 'tarrytown' },
-              { name: 'Round Rock', slug: 'round-rock' },
+              { name: 'Avery Ranch', slug: 'avery-ranch' },
               { name: 'Circle C Ranch', slug: 'circle-c' },
+              { name: 'Round Rock', slug: 'round-rock' },
               { name: 'Cedar Park', slug: 'cedar-park' },
             ].map((suburb) => (
               <button
