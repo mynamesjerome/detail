@@ -16,6 +16,12 @@ const FAQS: FAQItem[] = [
       "Yes, we just need access to a standard outdoor water spigot and a regular household electrical outlet at your home, driveway, or residence. We bring everything else—including commercial high-pressure hoses, 100ft heavy-duty extension cords, pressure washers, steam cleaners, vacuums, and all professional detailing chemicals.",
   },
   {
+    category: 'Mobile Service & Requirements',
+    question: 'What days and times is Gavin available for mobile detailing appointments?',
+    answer:
+      "Gavin's weekly mobile detailing schedule:\n• Monday & Wednesday: All Day (7:00 AM – 6:00 PM)\n• Tuesday, Thursday & Friday: Morning slots (7:00 AM and 10:00 AM)\n• Saturday & Sunday: Evening slots (5:00 PM)\nWhen you pick your desired date on our booking form, it will automatically present the exact open arrival slots for that day.",
+  },
+  {
     category: 'Packages & Services',
     question: 'What is the difference between the Basic Interior & Exterior and the Deluxe Detail?',
     answer:

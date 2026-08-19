@@ -84,7 +84,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
     email: '',
     serviceType,
     preferredDate: '',
-    preferredTime: 'Morning (8am - 12pm)',
+    preferredTime: '7:00 AM Morning',
     austinAddress: '',
     notes: '',
     policyAgreed
@@ -1034,63 +1034,134 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
 
                 {/* Date & Time Group */}
                 <div className="space-y-4 pt-4 border-t border-slate-700/80">
-                  <h3 className="text-sm font-bold text-blue-400 uppercase tracking-wider">
-                    3. Preferred Schedule
+                  <h3 className="text-sm font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-blue-400" />
+                    <span>3. Preferred Schedule</span>
                   </h3>
 
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="min-w-0">
-                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                        Preferred Date
-                      </label>
-                      <div className="relative w-full min-w-0 overflow-hidden rounded-xl bg-slate-900 border border-slate-700 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-colors">
-                        <Calendar className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
-                        <input
-                          id="input-date"
-                          type="date"
-                          min={todayStr}
-                          value={formData.preferredDate}
-                          onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
-                          style={{ colorScheme: 'dark' }}
-                          className="w-full min-w-0 max-w-full bg-transparent pl-10 pr-3.5 py-3 text-sm text-white focus:outline-none [color-scheme:dark] block border-0 appearance-none [-webkit-appearance:none] cursor-pointer"
-                        />
-                      </div>
-                    </div>
+                  {(() => {
+                    // Compute slots dynamically based on chosen date
+                    let currentDayInfo = {
+                      dayLabel: 'Pick a Date to View Open Slots',
+                      badge: 'Available Slots',
+                      badgeClass: 'bg-slate-800 text-slate-300 border-slate-700',
+                      slots: [
+                        '7:00 AM Morning',
+                        '10:00 AM Mid-Morning',
+                        '1:00 PM Afternoon (Mon/Wed)',
+                        '4:00 PM Afternoon (Mon/Wed)',
+                        '5:00 PM Evening (Sat/Sun)',
+                        'Flexible / First Available'
+                      ]
+                    };
 
-                    <div className="min-w-0">
-                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                        Preferred Arrival Time Slot
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          '8:00 AM Morning',
-                          '10:30 AM Mid-Morning',
-                          '1:00 PM Early Afternoon',
-                          '3:30 PM Late Afternoon',
-                          'Flexible / First Available'
-                        ].map((timeOption, idx) => {
-                          const isSelected = formData.preferredTime === timeOption;
-                          const isLast = idx === 4;
-                          return (
-                            <button
-                              key={timeOption}
-                              type="button"
-                              onClick={() => setFormData({ ...formData, preferredTime: timeOption })}
-                              className={`px-3 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer text-left ${
-                                isLast ? 'col-span-2' : ''
-                              } ${
-                                isSelected
-                                  ? 'bg-blue-600 text-white border-blue-500 shadow-md'
-                                  : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-600'
-                              }`}
-                            >
-                              {timeOption}
-                            </button>
-                          );
-                        })}
+                    if (formData.preferredDate) {
+                      const [yr, mo, dy] = formData.preferredDate.split('-').map(Number);
+                      const dObj = new Date(yr, mo - 1, dy);
+                      const dayOfWeek = dObj.getDay();
+
+                      if (dayOfWeek === 1 || dayOfWeek === 3) {
+                        // Mon / Wed
+                        currentDayInfo = {
+                          dayLabel: dayOfWeek === 1 ? 'Monday Schedule' : 'Wednesday Schedule',
+                          badge: 'All Day',
+                          badgeClass: 'bg-emerald-950/80 text-emerald-300 border-emerald-700/60',
+                          slots: ['7:00 AM Morning', '10:00 AM Mid-Morning', '1:00 PM Early Afternoon', '4:00 PM Late Afternoon', 'Flexible / All Day']
+                        };
+                      } else if (dayOfWeek === 2 || dayOfWeek === 4 || dayOfWeek === 5) {
+                        // Tue / Thu / Fri
+                        const name = dayOfWeek === 2 ? 'Tuesday' : dayOfWeek === 4 ? 'Thursday' : 'Friday';
+                        currentDayInfo = {
+                          dayLabel: `${name} Schedule`,
+                          badge: 'Morning Slots',
+                          badgeClass: 'bg-blue-950/80 text-blue-300 border-blue-700/60',
+                          slots: ['7:00 AM Morning', '10:00 AM Mid-Morning', 'Flexible Morning']
+                        };
+                      } else if (dayOfWeek === 6 || dayOfWeek === 0) {
+                        // Sat / Sun
+                        const name = dayOfWeek === 6 ? 'Saturday' : 'Sunday';
+                        currentDayInfo = {
+                          dayLabel: `${name} Schedule`,
+                          badge: '5:00 PM Slot',
+                          badgeClass: 'bg-amber-950/80 text-amber-300 border-amber-700/60',
+                          slots: ['5:00 PM Evening', 'Flexible Evening']
+                        };
+                      }
+                    }
+
+                    return (
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="min-w-0">
+                          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                            Preferred Date
+                          </label>
+                          <div className="relative w-full min-w-0 overflow-hidden rounded-xl bg-slate-900 border border-slate-700 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-colors">
+                            <Calendar className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+                            <input
+                              id="input-date"
+                              type="date"
+                              min={todayStr}
+                              value={formData.preferredDate}
+                              onChange={(e) => {
+                                const newDate = e.target.value;
+                                if (!newDate) {
+                                  setFormData({ ...formData, preferredDate: '' });
+                                  return;
+                                }
+                                const [yr, mo, dy] = newDate.split('-').map(Number);
+                                const dObj = new Date(yr, mo - 1, dy);
+                                const dayOfWeek = dObj.getDay();
+                                let newDefaultTime = '7:00 AM Morning';
+                                if (dayOfWeek === 6 || dayOfWeek === 0) {
+                                  newDefaultTime = '5:00 PM Evening';
+                                }
+                                setFormData({
+                                  ...formData,
+                                  preferredDate: newDate,
+                                  preferredTime: newDefaultTime
+                                });
+                              }}
+                              style={{ colorScheme: 'dark' }}
+                              className="w-full min-w-0 max-w-full bg-transparent pl-10 pr-3.5 py-3 text-sm text-white focus:outline-none [color-scheme:dark] block border-0 appearance-none [-webkit-appearance:none] cursor-pointer"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="min-w-0">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <label className="block text-xs font-semibold text-slate-300">
+                              Available Time Slot
+                            </label>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${currentDayInfo.badgeClass}`}>
+                              {currentDayInfo.badge}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {currentDayInfo.slots.map((timeOption, idx) => {
+                              const isSelected = formData.preferredTime === timeOption;
+                              const isLastAndOdd = idx === currentDayInfo.slots.length - 1 && currentDayInfo.slots.length % 2 === 1;
+                              return (
+                                <button
+                                  key={timeOption}
+                                  type="button"
+                                  onClick={() => setFormData({ ...formData, preferredTime: timeOption })}
+                                  className={`px-3 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer text-left ${
+                                    isLastAndOdd ? 'col-span-2' : ''
+                                  } ${
+                                    isSelected
+                                      ? 'bg-blue-600 text-white border-blue-500 shadow-md ring-1 ring-blue-400'
+                                      : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-600 hover:text-white'
+                                  }`}
+                                >
+                                  {timeOption}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    );
+                  })()}
                 </div>
 
                 {/* Notes & Captcha-style Policy Verification Trigger */}

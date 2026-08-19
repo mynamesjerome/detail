@@ -52,9 +52,23 @@ export default {
       }
     }
 
-    // Everything else: serve static assets (Vite /dist build)
+    // Everything else: serve static assets (Vite /dist build) with SPA fallback
     if (env.ASSETS) {
-      return env.ASSETS.fetch(request);
+      const response = await env.ASSETS.fetch(request);
+      
+      // If the static asset exists (e.g. .css, .js, images, fonts), return it
+      if (response.status !== 404) {
+        return response;
+      }
+
+      // For client-side routes like /book, /gallery, /pricing, etc., serve index.html
+      if (request.method === "GET" || request.method === "HEAD") {
+        const indexUrl = new URL("/", request.url);
+        const indexRequest = new Request(indexUrl, request);
+        return env.ASSETS.fetch(indexRequest);
+      }
+
+      return response;
     }
 
     return new Response("Not found", { status: 404 });
