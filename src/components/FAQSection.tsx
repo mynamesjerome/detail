@@ -28,12 +28,6 @@ const FAQS: FAQItem[] = [
       "Our Basic Interior & Exterior Detail ($130 Sedan / $150 SUV) provides a thorough full-vehicle wash, wheel cleaning, complete interior vacuum, and wipe-down. The Deluxe Detail ($170 Sedan / $190 SUV) is our signature package that adds deep interior steam sanitation, leather conditioning, UV dashboard protectant, iron chemical decontamination, and a 3-month ceramic spray coating for maximum gloss and water-beading protection.",
   },
   {
-    category: 'Austin Climate & Paint Protection',
-    question: 'How do you protect vehicles from Austin’s extreme heat, UV rays, and hard water?',
-    answer:
-      "Central Texas sun and mineral-heavy water cause fast clear coat oxidation and cracked interiors. Our Deluxe Detail includes ceramic-infused SiO2 sealants that form a hydrophobic UV barrier to reject road grime and prevent sun fading. All interior leather and vinyl receive non-greasy UV block conditioners.",
-  },
-  {
     category: 'Austin Coverage & Travel Area',
     question: 'What areas and suburbs around Greater Austin do you service?',
     answer:
