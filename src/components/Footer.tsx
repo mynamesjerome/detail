@@ -1,10 +1,11 @@
 import React from 'react';
 import { Logo } from './Logo';
 import { MapPin, Phone, MessageSquare, ArrowUp, ShieldCheck } from 'lucide-react';
+import { scrollToSection } from '../utils/navigation';
 
 export const Footer: React.FC = () => {
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToSection('/');
   };
 
   return (
@@ -31,34 +32,67 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-xs font-medium">
               <li>
-                <a href="#services" className="hover:text-white transition-colors">
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('/services')}
+                  className="hover:text-white transition-colors cursor-pointer text-left"
+                >
                   Detailing Packages
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#add-ons" className="hover:text-white transition-colors">
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('/addons')}
+                  className="hover:text-white transition-colors cursor-pointer text-left"
+                >
                   Custom Add-On Treatments
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#maintenance" className="hover:text-white transition-colors">
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('/maintenance')}
+                  className="hover:text-white transition-colors cursor-pointer text-left"
+                >
                   Maintenance Program
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#reviews" className="hover:text-white transition-colors">
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('/reviews')}
+                  className="hover:text-white transition-colors cursor-pointer text-left"
+                >
                   Google Client Reviews
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#service-area" className="hover:text-white transition-colors">
-                  Service Area (20-Mile Radius)
-                </a>
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('/service-area')}
+                  className="hover:text-white transition-colors cursor-pointer text-left"
+                >
+                  Service Area (30-Mile Radius)
+                </button>
               </li>
               <li>
-                <a href="#booking" className="hover:text-white transition-colors">
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('/faq')}
+                  className="hover:text-white transition-colors cursor-pointer text-left"
+                >
+                  Frequently Asked Questions (FAQ)
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('/book')}
+                  className="hover:text-white transition-colors cursor-pointer text-left"
+                >
                   Book Mobile Detail
-                </a>
+                </button>
               </li>
             </ul>
           </div>
@@ -90,12 +124,13 @@ export const Footer: React.FC = () => {
             </div>
 
             <div className="pt-2">
-              <a
-                href="#booking"
-                className="inline-block py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all shadow-md"
+              <button
+                type="button"
+                onClick={() => scrollToSection('/book')}
+                className="inline-block py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer"
               >
                 Book Mobile Service
-              </a>
+              </button>
             </div>
           </div>
 

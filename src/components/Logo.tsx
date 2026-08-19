@@ -52,9 +52,9 @@ export const Logo: React.FC<LogoProps> = ({
         /* Fallback logo display if /logo.png has not been uploaded yet */
         <div className={`relative flex items-center justify-center rounded-2xl overflow-hidden p-1.5 transition-all duration-300 group-hover:scale-105 shadow-xl ${logoHeights[size]} bg-slate-950 border border-slate-800`}>
           <img
-            src="/logo.svg"
+            src="/android-chrome-192x192.png"
             alt="Gavin's Car Detailing"
-            className="h-full w-auto aspect-square object-contain bg-transparent"
+            className="h-full w-auto aspect-square object-contain bg-transparent rounded-xl"
           />
           <div className="flex flex-col text-left pl-2 pr-3 leading-none">
             <span className="font-black text-white text-sm sm:text-base tracking-widest uppercase font-serif group-hover:text-blue-400 transition-colors">

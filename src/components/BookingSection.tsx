@@ -1043,7 +1043,8 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                       <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                         Preferred Date
                       </label>
-                      <div className="relative w-full min-w-0">
+                      <div className="relative w-full min-w-0 overflow-hidden rounded-xl bg-slate-900 border border-slate-700 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-colors">
+                        <Calendar className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
                         <input
                           id="input-date"
                           type="date"
@@ -1051,7 +1052,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                           value={formData.preferredDate}
                           onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
                           style={{ colorScheme: 'dark' }}
-                          className="w-full min-w-0 max-w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-sm text-white focus:outline-none focus:border-blue-500 [color-scheme:dark] transition-colors"
+                          className="w-full min-w-0 max-w-full bg-transparent pl-10 pr-3.5 py-3 text-sm text-white focus:outline-none [color-scheme:dark] block border-0 appearance-none [-webkit-appearance:none] cursor-pointer"
                         />
                       </div>
                     </div>

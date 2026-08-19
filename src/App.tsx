@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { VehicleType, BookingServiceType } from './types';
 import { SERVICE_PACKAGES, ADD_ON_SERVICES } from './data/content';
 import { Navbar } from './components/Navbar';
@@ -8,10 +8,11 @@ import { AddOnsGrid } from './components/AddOnsGrid';
 import { MaintenanceProgram } from './components/MaintenanceProgram';
 import { ReviewsMarquee } from './components/ReviewsMarquee';
 import { ServiceAreaSection } from './components/ServiceAreaSection';
+import { FAQSection } from './components/FAQSection';
 import { BeforeAfterGallery } from './components/BeforeAfterGallery';
 import { BookingSection } from './components/BookingSection';
 import { Footer } from './components/Footer';
-import { animateScrollTo } from './utils/scroll';
+import { scrollToSection, getRouteByPath } from './utils/navigation';
 
 export default function App() {
   const [vehicleType, setVehicleType] = useState<VehicleType>('sedan');
@@ -21,16 +22,35 @@ export default function App() {
   const [selectedAddOnIds, setSelectedAddOnIds] = useState<string[]>([]);
   const [policyAgreed, setPolicyAgreed] = useState<boolean>(false);
 
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      const headerOffset = 75;
-      const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
-      const offsetPosition = Math.max(0, elementPosition - headerOffset);
+  // Handle initial page load deep-linking and browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const route = getRouteByPath(window.location.pathname);
+      if (route.id !== 'hero') {
+        scrollToSection(route.id, false, 500);
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
 
-      animateScrollTo(offsetPosition, 850);
+    window.addEventListener('popstate', handlePopState);
+
+    // If loaded directly with a path (e.g., /services, /gallery, /book)
+    const initialRoute = getRouteByPath(window.location.pathname);
+    if (initialRoute.id !== 'hero') {
+      const timer = setTimeout(() => {
+        scrollToSection(initialRoute.id, false, 800);
+      }, 150);
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener('popstate', handlePopState);
+      };
     }
-  };
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
 
   const handleSelectPackage = (packageId: string) => {
     setServiceType('standard');
@@ -122,8 +142,11 @@ export default function App() {
           onTogglePolicyAgree={setPolicyAgreed}
         />
 
-        {/* Smooth Gradient Transition: Booking Section (bg-slate-900) -> Footer (bg-slate-950) */}
-        <div className="h-20 bg-gradient-to-b from-slate-900 to-slate-950" />
+        {/* High-Intent SEO FAQ Accordion Section (bg-slate-950) Below Booking Form */}
+        <FAQSection onBookClick={() => scrollToSection('booking')} />
+
+        {/* Smooth Gradient Transition: FAQ Section (bg-slate-950) -> Footer (bg-slate-950) */}
+        <div className="h-12 bg-slate-950" />
       </main>
 
       {/* Footer */}

@@ -236,25 +236,6 @@ export const BeforeAfterGallery: React.FC = () => {
     return () => cancelAnimationFrame(animationFrameId);
   }, [isDragging, selectedGroup]);
 
-  // Mouse wheel horizontal scrolling listener
-  const handleGalleryWheel = (e: React.WheelEvent) => {
-    const el = galleryRowRef.current;
-    if (!el) return;
-
-    // Convert mouse wheel scroll (vertical deltaY or horizontal deltaX) into horizontal scroll
-    const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-    if (Math.abs(delta) > 0) {
-      el.scrollLeft += delta;
-      
-      // Loop if out of bounds
-      if (el.scrollLeft >= el.scrollWidth / 2) {
-        el.scrollLeft -= el.scrollWidth / 2;
-      } else if (el.scrollLeft <= 0) {
-        el.scrollLeft += el.scrollWidth / 2;
-      }
-    }
-  };
-
   // Mouse drag-to-scroll handlers
   const handleMouseDown = (e: React.MouseEvent) => {
     const el = galleryRowRef.current;
@@ -635,7 +616,6 @@ export const BeforeAfterGallery: React.FC = () => {
         {/* Unified Stream Row */}
         <div
           ref={galleryRowRef}
-          onWheel={handleGalleryWheel}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUpOrLeave}

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Logo } from './Logo';
 import { Phone, Calendar, Menu, X, MapPin, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { animateScrollTo } from '../utils/scroll';
+import { scrollToSection, getRouteByPath } from '../utils/navigation';
 
 interface NavbarProps {
   onBookClick: () => void;
@@ -11,93 +11,112 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onBookClick }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileBookPopping, setMobileBookPopping] = useState(false);
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    const updatePath = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', updatePath);
+    return () => window.removeEventListener('popstate', updatePath);
+  }, []);
 
   const handleMobileBookClick = () => {
     setMobileBookPopping(true);
     setTimeout(() => setMobileBookPopping(false), 350);
-    onBookClick();
+    scrollToSection('/book');
   };
 
-  const scrollToSection = (id: string) => {
+  const handleNavClick = (pathOrId: string) => {
     setMobileMenuOpen(false);
-    
-    // Slight delay to allow mobile drawer state / layout to settle before smooth scrolling
     setTimeout(() => {
-      const element = document.getElementById(id);
-      if (element) {
-        const headerOffset = 75;
-        const bodyRect = document.body.getBoundingClientRect().top;
-        const elementRect = element.getBoundingClientRect().top;
-        const elementPosition = elementRect - bodyRect;
-        const offsetPosition = Math.max(0, elementPosition - headerOffset);
-
-        animateScrollTo(offsetPosition, 850);
-      }
-    }, 50);
+      scrollToSection(pathOrId);
+    }, 40);
   };
 
-  const scrollToTop = () => {
+  const handleLogoClick = () => {
     setMobileMenuOpen(false);
-    animateScrollTo(0, 850);
+    scrollToSection('/');
   };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950 border-b border-slate-800 shadow-xl py-3 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          {/* Logo (Bigger) with Smooth Scroll to Top */}
+          {/* Logo with Smooth Scroll to Top & URL reset to / */}
           <button
             type="button"
-            onClick={scrollToTop}
+            onClick={handleLogoClick}
             className="group flex items-center gap-2 focus:outline-none rounded-xl p-1 cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] text-left"
             aria-label="Scroll back to top"
           >
             <Logo size="lg" variant="light" />
           </button>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation with URL deep-links */}
           <nav className="hidden md:flex items-center gap-7">
             <button
               type="button"
-              onClick={() => scrollToSection('services')}
-              className="text-sm font-semibold text-slate-200 hover:text-blue-400 transition-colors cursor-pointer"
+              onClick={() => handleNavClick('/services')}
+              className={`text-sm font-semibold transition-colors cursor-pointer ${
+                currentPath === '/services' ? 'text-blue-400' : 'text-slate-200 hover:text-blue-400'
+              }`}
             >
               Services
             </button>
             <button
               type="button"
-              onClick={() => scrollToSection('add-ons')}
-              className="text-sm font-semibold text-slate-200 hover:text-blue-400 transition-colors cursor-pointer"
+              onClick={() => handleNavClick('/addons')}
+              className={`text-sm font-semibold transition-colors cursor-pointer ${
+                currentPath === '/addons' || currentPath === '/add-ons' ? 'text-blue-400' : 'text-slate-200 hover:text-blue-400'
+              }`}
             >
               Add-Ons
             </button>
             <button
               type="button"
-              onClick={() => scrollToSection('gallery')}
-              className="text-sm font-semibold text-slate-200 hover:text-blue-400 transition-colors cursor-pointer"
+              onClick={() => handleNavClick('/gallery')}
+              className={`text-sm font-semibold transition-colors cursor-pointer ${
+                currentPath === '/gallery' ? 'text-blue-400' : 'text-slate-200 hover:text-blue-400'
+              }`}
             >
               Gallery
             </button>
             <button
               type="button"
-              onClick={() => scrollToSection('maintenance')}
-              className="text-sm font-semibold text-slate-200 hover:text-blue-400 transition-colors cursor-pointer"
+              onClick={() => handleNavClick('/maintenance')}
+              className={`text-sm font-semibold transition-colors cursor-pointer ${
+                currentPath === '/maintenance' ? 'text-blue-400' : 'text-slate-200 hover:text-blue-400'
+              }`}
             >
               Maintenance
             </button>
             <button
               type="button"
-              onClick={() => scrollToSection('reviews')}
-              className="text-sm font-semibold text-slate-200 hover:text-blue-400 transition-colors cursor-pointer"
+              onClick={() => handleNavClick('/reviews')}
+              className={`text-sm font-semibold transition-colors cursor-pointer ${
+                currentPath === '/reviews' ? 'text-blue-400' : 'text-slate-200 hover:text-blue-400'
+              }`}
             >
               Reviews
             </button>
             <button
               type="button"
-              onClick={() => scrollToSection('service-area')}
-              className="text-sm font-semibold text-slate-200 hover:text-blue-400 transition-colors cursor-pointer"
+              onClick={() => handleNavClick('/service-area')}
+              className={`text-sm font-semibold transition-colors cursor-pointer ${
+                currentPath === '/service-area' || currentPath === '/servicearea' ? 'text-blue-400' : 'text-slate-200 hover:text-blue-400'
+              }`}
             >
               Service Area
+            </button>
+            <button
+              type="button"
+              onClick={() => handleNavClick('/faq')}
+              className={`text-sm font-semibold transition-colors cursor-pointer ${
+                currentPath === '/faq' ? 'text-blue-400' : 'text-slate-200 hover:text-blue-400'
+              }`}
+            >
+              FAQ
             </button>
           </nav>
 
@@ -113,7 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookClick }) => {
 
             <button
               type="button"
-              onClick={onBookClick}
+              onClick={() => handleNavClick('/book')}
               className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-extrabold text-white bg-blue-600 hover:bg-blue-500 rounded-full shadow-lg shadow-blue-600/30 hover:shadow-blue-500/50 transition-all uppercase tracking-wider cursor-pointer animate-shimmer relative overflow-hidden"
             >
               <Calendar className="w-4 h-4 relative z-10" />
@@ -157,7 +176,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookClick }) => {
             <div className="px-4 pt-3 pb-6 flex flex-col gap-1 py-2">
               <button
                 type="button"
-                onClick={() => scrollToSection('services')}
+                onClick={() => handleNavClick('/services')}
                 className="w-full flex items-center justify-between py-3 px-2 text-left text-base font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-xl border-b border-slate-900/80 active:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
               >
                 <span>Services & Packages</span>
@@ -165,7 +184,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookClick }) => {
               </button>
               <button
                 type="button"
-                onClick={() => scrollToSection('add-ons')}
+                onClick={() => handleNavClick('/addons')}
                 className="w-full flex items-center justify-between py-3 px-2 text-left text-base font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-xl border-b border-slate-900/80 active:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
               >
                 <span>Custom Add-Ons</span>
@@ -173,7 +192,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookClick }) => {
               </button>
               <button
                 type="button"
-                onClick={() => scrollToSection('gallery')}
+                onClick={() => handleNavClick('/gallery')}
                 className="w-full flex items-center justify-between py-3 px-2 text-left text-base font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-xl border-b border-slate-900/80 active:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
               >
                 <span>Photo Gallery</span>
@@ -181,7 +200,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookClick }) => {
               </button>
               <button
                 type="button"
-                onClick={() => scrollToSection('maintenance')}
+                onClick={() => handleNavClick('/maintenance')}
                 className="w-full flex items-center justify-between py-3 px-2 text-left text-base font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-xl border-b border-slate-900/80 active:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
               >
                 <span>Maintenance Program</span>
@@ -189,7 +208,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookClick }) => {
               </button>
               <button
                 type="button"
-                onClick={() => scrollToSection('reviews')}
+                onClick={() => handleNavClick('/reviews')}
                 className="w-full flex items-center justify-between py-3 px-2 text-left text-base font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-xl border-b border-slate-900/80 active:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
               >
                 <span>Customer Reviews</span>
@@ -199,20 +218,25 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookClick }) => {
               </button>
               <button
                 type="button"
-                onClick={() => scrollToSection('service-area')}
-                className="w-full flex items-center justify-between py-3 px-2 text-left text-base font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-xl active:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
+                onClick={() => handleNavClick('/service-area')}
+                className="w-full flex items-center justify-between py-3 px-2 text-left text-base font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-xl border-b border-slate-900/80 active:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
               >
                 <span>Service Area & Coverage</span>
-                <span className="text-xs text-blue-400 font-medium">20-Mile Radius</span>
+                <span className="text-xs text-blue-400 font-medium">30-Mile Radius</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleNavClick('/faq')}
+                className="w-full flex items-center justify-between py-3 px-2 text-left text-base font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-xl active:bg-slate-800 transition-colors cursor-pointer touch-manipulation"
+              >
+                <span>Frequently Asked Questions</span>
+                <span className="text-xs text-cyan-400 font-medium">Q&A</span>
               </button>
 
               <div className="pt-4 flex flex-col gap-2.5">
                 <button
                   type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setTimeout(() => onBookClick(), 50);
-                  }}
+                  onClick={() => handleNavClick('/book')}
                   className="w-full flex items-center justify-center gap-2 py-3.5 text-sm font-extrabold uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-500 rounded-2xl shadow-xl shadow-blue-600/40 animate-shimmer relative overflow-hidden cursor-pointer touch-manipulation"
                 >
                   <Calendar className="w-4 h-4 relative z-10" />
