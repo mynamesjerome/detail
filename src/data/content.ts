@@ -231,20 +231,6 @@ export const REVIEWS: Review[] = [
     rating: 5,
     timeAgo: 'Verified Customer',
     text: 'Gavin has continually provided me first-class service for every cleaning. He simplified the process and is always prompt and professional. Would recommend to any and all.'
-  },
-  {
-    id: 'julia-kevon',
-    author: 'Julia Kevon',
-    rating: 5,
-    timeAgo: 'Verified Customer',
-    text: "I was blown away by Gavin's attention to detail. My car looked cleaner than the day I drove it off the lot. 10/10 service!"
-  },
-  {
-    id: 'marcus-vance',
-    author: 'Marcus Vance',
-    rating: 5,
-    timeAgo: 'Verified Customer',
-    text: "Gavin detailed our family SUV that had 2 years of kid messes and road trip dirt. Completely spotless now. Can't recommend him enough."
   }
 ];
 

@@ -8,12 +8,14 @@ import {
   Phone, 
   MessageSquare, 
   ArrowRight, 
-  Sparkles
+  Sparkles,
+  MapPin
 } from 'lucide-react';
 import { SERVICE_LOCATIONS } from '../data/serviceArea';
 
 interface ServiceAreaSectionProps {
   onBookClick: () => void;
+  onSelectLocation?: (slug: string) => void;
 }
 
 // Austin ZIP 78759 Coordinates (Arboretum / Great Hills)
@@ -42,7 +44,10 @@ const ResponsiveMapZoom: React.FC = () => {
   return null;
 };
 
-export const ServiceAreaSection: React.FC<ServiceAreaSectionProps> = ({ onBookClick }) => {
+export const ServiceAreaSection: React.FC<ServiceAreaSectionProps> = ({ 
+  onBookClick, 
+  onSelectLocation 
+}) => {
   const [zipInput, setZipInput] = useState<string>('');
   const [searchResult, setSearchResult] = useState<{
     searchedZip: string;
@@ -96,11 +101,36 @@ export const ServiceAreaSection: React.FC<ServiceAreaSectionProps> = ({ onBookCl
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Clean Section Title */}
-        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+        {/* Clean Section Title & Neighborhood Quick Links */}
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10 space-y-3">
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
             Our Service Area
           </h2>
+          <p className="text-xs sm:text-sm text-slate-400">
+            Providing 5-star mobile auto detailing delivered right to your driveway across Greater Austin.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+            {[
+              { name: 'Westlake Hills', slug: 'westlake-hills' },
+              { name: 'Lakeway', slug: 'lakeway' },
+              { name: 'Bee Cave', slug: 'bee-cave' },
+              { name: 'Barton Creek', slug: 'barton-creek' },
+              { name: 'Tarrytown', slug: 'tarrytown' },
+              { name: 'Round Rock', slug: 'round-rock' },
+              { name: 'Circle C Ranch', slug: 'circle-c' },
+              { name: 'Cedar Park', slug: 'cedar-park' },
+            ].map((suburb) => (
+              <button
+                key={suburb.slug}
+                type="button"
+                onClick={() => onSelectLocation?.(suburb.slug)}
+                className="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-blue-500/50 text-xs font-semibold text-slate-300 hover:text-blue-400 transition-all cursor-pointer shadow-sm flex items-center gap-1"
+              >
+                <MapPin className="w-3 h-3 text-blue-400 shrink-0" />
+                <span>{suburb.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* 2-Column Grid: Map on Left & Perfectly Vertically Centered Checker on Right */}

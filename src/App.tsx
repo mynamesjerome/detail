@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { VehicleType, BookingServiceType } from './types';
 import { SERVICE_PACKAGES, ADD_ON_SERVICES } from './data/content';
+import { LOCATION_LANDING_PAGES, SERVICE_LANDING_PAGES } from './data/landingPages';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { ServicePackages } from './components/ServicePackages';
@@ -12,6 +13,7 @@ import { FAQSection } from './components/FAQSection';
 import { BeforeAfterGallery } from './components/BeforeAfterGallery';
 import { BookingSection } from './components/BookingSection';
 import { Footer } from './components/Footer';
+import { LandingPageModal } from './components/LandingPageModal';
 import { scrollToSection, getRouteByPath } from './utils/navigation';
 
 export default function App() {
@@ -22,35 +24,97 @@ export default function App() {
   const [selectedAddOnIds, setSelectedAddOnIds] = useState<string[]>([]);
   const [policyAgreed, setPolicyAgreed] = useState<boolean>(false);
 
+  // High-Intent SEO Landing Pages modal state
+  const [activeLocationSlug, setActiveLocationSlug] = useState<string | null>(null);
+  const [activeServiceSlug, setActiveServiceSlug] = useState<string | null>(null);
+
+  // Check URL pathname for deep-linked location or specialty service
+  const parsePath = (path: string) => {
+    if (path.startsWith('/locations/')) {
+      const slug = path.replace('/locations/', '').replace(/\/$/, '');
+      if (LOCATION_LANDING_PAGES[slug]) {
+        setActiveLocationSlug(slug);
+        setActiveServiceSlug(null);
+        document.title = `${LOCATION_LANDING_PAGES[slug].headline} | Gavin's Car Detailing`;
+        return true;
+      }
+    } else if (path.startsWith('/services/')) {
+      const slug = path.replace('/services/', '').replace(/\/$/, '');
+      if (SERVICE_LANDING_PAGES[slug]) {
+        setActiveServiceSlug(slug);
+        setActiveLocationSlug(null);
+        document.title = `${SERVICE_LANDING_PAGES[slug].headline} | Gavin's Car Detailing`;
+        return true;
+      }
+    }
+    return false;
+  };
+
   // Handle initial page load deep-linking and browser back/forward navigation
   useEffect(() => {
     const handlePopState = () => {
-      const route = getRouteByPath(window.location.pathname);
-      if (route.id !== 'hero') {
-        scrollToSection(route.id, false, 500);
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      const path = window.location.pathname;
+      const isLanding = parsePath(path);
+      if (!isLanding) {
+        setActiveLocationSlug(null);
+        setActiveServiceSlug(null);
+        document.title = "Gavin's Car Detailing | Premier Mobile Detailing in Austin, TX";
+        const route = getRouteByPath(path);
+        if (route.id !== 'hero') {
+          scrollToSection(route.id, false, 500);
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       }
     };
 
     window.addEventListener('popstate', handlePopState);
 
-    // If loaded directly with a path (e.g., /services, /gallery, /book)
-    const initialRoute = getRouteByPath(window.location.pathname);
-    if (initialRoute.id !== 'hero') {
-      const timer = setTimeout(() => {
-        scrollToSection(initialRoute.id, false, 800);
-      }, 150);
-      return () => {
-        clearTimeout(timer);
-        window.removeEventListener('popstate', handlePopState);
-      };
+    // Initial load check
+    const path = window.location.pathname;
+    const isLanding = parsePath(path);
+    if (!isLanding) {
+      const initialRoute = getRouteByPath(path);
+      if (initialRoute.id !== 'hero') {
+        const timer = setTimeout(() => {
+          scrollToSection(initialRoute.id, false, 800);
+        }, 150);
+        return () => {
+          clearTimeout(timer);
+          window.removeEventListener('popstate', handlePopState);
+        };
+      }
     }
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
   }, []);
+
+  const handleOpenLocation = (slug: string) => {
+    if (LOCATION_LANDING_PAGES[slug]) {
+      setActiveLocationSlug(slug);
+      setActiveServiceSlug(null);
+      window.history.pushState(null, '', `/locations/${slug}`);
+      document.title = `${LOCATION_LANDING_PAGES[slug].headline} | Gavin's Car Detailing`;
+    }
+  };
+
+  const handleOpenService = (slug: string) => {
+    if (SERVICE_LANDING_PAGES[slug]) {
+      setActiveServiceSlug(slug);
+      setActiveLocationSlug(null);
+      window.history.pushState(null, '', `/services/${slug}`);
+      document.title = `${SERVICE_LANDING_PAGES[slug].headline} | Gavin's Car Detailing`;
+    }
+  };
+
+  const handleCloseLandingModal = () => {
+    setActiveLocationSlug(null);
+    setActiveServiceSlug(null);
+    window.history.pushState(null, '', '/');
+    document.title = "Gavin's Car Detailing | Premier Mobile Detailing in Austin, TX";
+  };
 
   const handleSelectPackage = (packageId: string) => {
     setServiceType('standard');
@@ -121,7 +185,10 @@ export default function App() {
         <div className="h-12 bg-gradient-to-b from-slate-950 to-slate-950" />
 
         {/* 30-Mile Mobile Service Area & Zip Code Radius Checker (bg-slate-950) */}
-        <ServiceAreaSection onBookClick={() => scrollToSection('booking')} />
+        <ServiceAreaSection 
+          onBookClick={() => scrollToSection('booking')} 
+          onSelectLocation={handleOpenLocation}
+        />
 
         {/* Smooth Gradient Transition: Service Area (bg-slate-950) -> Booking Section (bg-slate-900) */}
         <div className="h-16 bg-gradient-to-b from-slate-950 to-slate-900" />
@@ -149,8 +216,23 @@ export default function App() {
         <div className="h-12 bg-slate-950" />
       </main>
 
-      {/* Footer */}
-      <Footer />
+      {/* Footer with SEO Suburb and Specialty Links */}
+      <Footer 
+        onSelectLocation={handleOpenLocation} 
+        onSelectService={handleOpenService} 
+      />
+
+      {/* High-Intent SEO Landing Page Modal */}
+      <LandingPageModal
+        isOpen={!!activeLocationSlug || !!activeServiceSlug}
+        locationData={activeLocationSlug ? LOCATION_LANDING_PAGES[activeLocationSlug] || null : null}
+        serviceData={activeServiceSlug ? SERVICE_LANDING_PAGES[activeServiceSlug] || null : null}
+        onClose={handleCloseLandingModal}
+        onBookNow={() => {
+          handleCloseLandingModal();
+          scrollToSection('booking');
+        }}
+      />
     </div>
   );
 }
